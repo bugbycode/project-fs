@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="role">
+	<resultMap type="role" id="roleResult">
+		<result property="id" 					column="id"/>
+		<result property="name" 				column="name"/>
+		<result property="description" 			column="description"/>
+		<result property="grantedAuthority" 	column="granted_authority"/>
+		<result property="type" 				column="type"/>
+		<result property="createTime" 			column="create_time"/>
+		<result property="updateTime" 			column="update_time"/>
+	</resultMap>
+	<select id="queryById" parameterType="int" resultMap="roleResult">
+		<![CDATA[
+			SELECT
+			  `id`,
+			  `name`,
+			  `description`,
+			  `granted_authority`,
+			  `type`,
+			  `create_time`,
+			  `update_time`
+			FROM `role` WHERE `id` = #{id}
+		]]>
+	</select>
+	<select id="query" parameterType="java.util.HashMap" resultMap="roleResult">
+		<![CDATA[
+			SELECT
+			  `id`,
+			  `name`,
+			  `description`,
+			  `granted_authority`,
+			  `type`,
+			  `create_time`,
+			  `update_time`
+			FROM `role`
+		]]>
+		<where>
+			<if test="paramQuery!=null and paramQuery!=''">
+				<![CDATA[
+					AND (
+						`name` LIKE CONCAT('%',#{paramQuery},'%') 
+						OR `description` LIKE CONCAT('%',#{paramQuery},'%')
+					)
+				]]>
+			</if>
+			<if test="roleName!=null and roleName!=''">
+				<![CDATA[
+					AND `name` LIKE CONCAT('%',#{roleName},'%') 
+				]]>
+			</if>
+		</where>
+		<if test="offset!=null and offset!=''">
+			<![CDATA[
+				LIMIT #{offset},#{limit}
+			]]>
+		</if>
+	</select>
+	
+	<select id="count" parameterType="java.util.HashMap" resultType="int">
+		<![CDATA[
+			SELECT COUNT(*) FROM `role`
+		]]>
+		<where>
+			<if test="paramQuery!=null and paramQuery!=''">
+				<![CDATA[
+					AND (
+						`name` LIKE CONCAT('%',#{paramQuery},'%') 
+						OR `description` LIKE CONCAT('%',#{paramQuery},'%')
+					)
+				]]>
+			</if>
+		</where>
+	</select>
+	
+	<select id="queryByName" parameterType="java.lang.String" resultMap="roleResult">
+		<![CDATA[
+			SELECT
+			  `id`,
+			  `name`,
+			  `description`,
+			  `granted_authority`,
+			  `type`,
+			  `create_time`,
+			  `update_time`
+			FROM `role` WHERE `name` = #{name}
+		]]>
+	</select>
+</mapper>  

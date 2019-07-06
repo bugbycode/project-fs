@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="head">
+	<!-- begin #header -->
+		<div id="header" class="header navbar-default">
+			<!-- begin navbar-header -->
+			<div class="navbar-header">
+				<a th:href="@{/layout}" class="navbar-brand"><span class="navbar-logo"><i class="ion-ios-cloud"></i></span> <b>项目信息管理平台</b></a>
+				<button type="button" class="navbar-toggle" data-click="sidebar-toggled">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<!-- end navbar-header -->
+			
+			<!-- begin header-nav -->
+			<ul class="navbar-nav navbar-right">
+				<li class="dropdown navbar-user">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						<img th:src="@{/images/user.gif}" /> 
+						<span class="d-none d-md-inline" th:text="${session.SPRING_SECURITY_CONTEXT.authentication.principal.name}"></span> <b class="caret"></b>
+					</a>
+					<div class="dropdown-menu" style="min-width: 100%;">
+						<a href="javascript:;" class="dropdown-item">安全设置</a>
+						<div class="dropdown-divider"></div>
+						<a href="javascript:;" class="dropdown-item loginOut">退出</a>
+					</div>
+				</li>
+			</ul>
+			<form id="loginOut" th:action="@{/logout}" method="POST">
+			</form>
+			<!-- end header navigation right -->
+		</div>
+		<!-- end #header -->
+		<script type="text/javascript">
+			$(document).ready(function() {
+				App.init();
+				$(".loginOut").click(function(){
+					$("#loginOut").submit();
+				});
+			});
+		</script>
+</body>
+</html>

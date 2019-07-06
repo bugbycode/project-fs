@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 
+<html lang="cn" class="ie8"
+ xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"> 
+<![endif]-->
+<!--[if !IE]><!-->
+<html lang="cn" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org" >
+<!--<![endif]-->
+<head>
+	<meta charset="utf-8" />
+	<title>项目信息管理平台</title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+	<meta content="" name="description" />
+	<meta content="" name="author" />
+	
+	<!-- ================== BEGIN BASE CSS STYLE ================== -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+	<link th:href="@{/assets/plugins/jquery-ui/jquery-ui.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/plugins/bootstrap/css/bootstrap.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/plugins/font-awesome/css/all.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/plugins/ionicons/css/ionicons.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/plugins/animate/animate.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/css/apple/style.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/css/apple/style-responsive.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/css/apple/theme/default.css}" rel="stylesheet" id="theme" />
+	<!-- ================== END BASE CSS STYLE ================== -->
+	
+	<!-- ================== BEGIN BASE JS ================== -->
+	<script th:src="@{/assets/plugins/pace/pace.min.js}"></script>
+	<script th:src="@{/assets/plugins/jquery/jquery-3.3.1.min.js}"></script>
+	<!-- ================== END BASE JS ================== -->
+	<!-- ================== END PAGE LEVEL JS ================== -->
+	<script type="text/javascript" th:src="@{/javascript/custom/bugbycode.js}"></script>
+</head>
+<body>
+	<!-- begin #page-loader -->
+	<div id="page-loader" class="fade show"><span class="spinner"></span></div>
+	<!-- end #page-loader -->
+	
+	<!-- begin #page-container -->
+	<div id="page-container" class="page-container fade page-sidebar-fixed page-header-fixed">
+		<!-- begin #header -->
+		<div th:include="pages/layout/head :: head"></div>
+		<!-- end #header -->
+		
+		<!-- begin #sidebar -->
+		<!-- 左侧菜单 -->
+		<div th:include="pages/layout/left :: left('employee','employee')"></div>
+		<!-- end #sidebar -->
+		
+		<!-- begin #content -->
+		<div id="content" class="content">
+			
+		</div>
+		<!-- end #content -->
+		
+		<!-- begin scroll to top btn -->
+		<a href="javascript:;" class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade" data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
+		<!-- end scroll to top btn -->
+	</div>
+	<!-- end page container -->
+	
+	<!-- ================== BEGIN BASE JS ================== -->
+	<script th:src="@{/assets/plugins/jquery-ui/jquery-ui.min.js}"></script>
+	<script th:src="@{/assets/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<!--[if lt IE 9]>
+		<script th:src="@{/assets/crossbrowserjs/html5shiv.js}"></script>
+		<script th:src="@{/assets/crossbrowserjs/respond.min.js}"></script>
+		<script th:src="@{/assets/crossbrowserjs/excanvas.min.js}"></script>
+	<![endif]-->
+	<script th:src="@{/assets/plugins/slimscroll/jquery.slimscroll.min.js}"></script>
+	<script th:src="@{/assets/plugins/js-cookie/js.cookie.js}"></script>
+	<script th:src="@{/assets/js/theme/apple.min.js}"></script>
+	<script th:src="@{/assets/js/apps.min.js}"></script>
+	<!-- ================== END BASE JS ================== -->
+</body>
+</html>

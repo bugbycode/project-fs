@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="employee">
+	<resultMap type="employee" id="employeeResult">
+		<result property="id" 				column="id"/>
+		<result property="name" 			column="name"/>
+		<result property="username" 		column="username"/>
+		<result property="password" 		column="password"/>
+		<result property="email" 			column="email"/>
+		<result property="status" 			column="status"/>
+		<result property="type" 			column="type"/>
+		<result property="createTime" 		column="create_time"/>
+		<result property="updateTime" 		column="update_time"/>
+		<result property="roleId"			column="role_id"/>
+		<result property="roleName"			column="role_name"/>
+	</resultMap>
+	<select id="queryByUserNameAndPassword" parameterType="java.util.HashMap" resultMap="employeeResult">
+		<![CDATA[
+			SELECT
+			  e.`id`,
+			  e.`name`,
+			  e.`username`,
+			  e.`password`,
+			  e.`email`,
+			  e.`type`,
+			  e.`status`,
+			  e.`create_time`,
+			  e.`update_time`,
+			  e.`role_id`,
+			  r.`name` AS role_name
+			FROM `employee` e left join `role` r ON e.role_id = r.id WHERE e.`username` = #{username} AND e.`password` = #{password} LIMIT 1
+		]]>
+	</select>
+	<select id="query" parameterType="java.util.HashMap" resultMap="employeeResult">
+		<![CDATA[
+			SELECT
+			  e.`id`,
+			  e.`name`,
+			  e.`username`,
+			  e.`password`,
+			  e.`email`,
+			  e.`type`,
+			  e.`status`,
+			  e.`create_time`,
+			  e.`update_time`,
+			  e.`role_id`,
+			  r.`name` AS role_name
+			FROM `employee` e left join `role` r ON e.role_id = r.id 
+		]]>
+		<where>
+			<if test="paramQuery!=null and paramQuery!=''">
+				<![CDATA[
+					AND (
+						e.`name` LIKE CONCAT('%',#{paramQuery},'%') 
+						OR e.`username` LIKE CONCAT('%',#{paramQuery},'%')
+						OR e.`email` LIKE CONCAT('%',#{paramQuery},'%')
+						OR r.`name` LIKE CONCAT('%',#{paramQuery},'%')
+					)
+				]]>
+			</if>
+		</where>
+		<if test="offset!=null and offset!=''">
+			<![CDATA[
+				LIMIT #{offset},#{limit}
+			]]>
+		</if>
+	</select>
+	
+	<select id="count" parameterType="java.util.HashMap" resultType="int">
+		<![CDATA[
+			SELECT COUNT(e.id) FROM `employee` e left join `role` r ON e.role_id = r.id 
+		]]>
+		<where>
+			<if test="paramQuery!=null and paramQuery!=''">
+				<![CDATA[
+					AND (
+						e.`name` LIKE CONCAT('%',#{paramQuery},'%') 
+						OR e.`username` LIKE CONCAT('%',#{paramQuery},'%')
+						OR e.`email` LIKE CONCAT('%',#{paramQuery},'%')
+						OR r.`name` LIKE CONCAT('%',#{paramQuery},'%')
+					)
+				]]>
+			</if>
+		</where>
+	</select>
+	
+	<select id="queryById" parameterType="int" resultMap="employeeResult">
+		<![CDATA[
+			SELECT
+			  e.`id`,
+			  e.`name`,
+			  e.`username`,
+			  e.`password`,
+			  e.`email`,
+			  e.`type`,
+			  e.`status`,
+			  e.`create_time`,
+			  e.`update_time`,
+			  e.`role_id`,
+			  r.`name` AS role_name
+			FROM `employee` e left join `role` r ON e.role_id = r.id WHERE e.`id` = #{empId}
+		]]>
+	</select>
+	
+	<select id="queryByUserName" parameterType="java.lang.String" resultMap="employeeResult">
+		<![CDATA[
+			SELECT
+			  e.`id`,
+			  e.`name`,
+			  e.`username`,
+			  e.`password`,
+			  e.`email`,
+			  e.`type`,
+			  e.`status`,
+			  e.`create_time`,
+			  e.`update_time`,
+			  e.`role_id`,
+			  r.`name` AS role_name
+			FROM `employee` e left join `role` r ON e.role_id = r.id WHERE e.`username` = #{userName}
+		]]>
+	</select>
+	
+	<insert id="insert" parameterType="employee">
+		<![CDATA[
+			INSERT INTO `employee`
+            (
+             `name`,
+             `username`,
+             `password`,
+             `email`,
+             `type`,
+             `status`,
+             `create_time`,
+             `role_id`)
+			VALUES (
+			        #{name},
+			        #{username},
+			        #{password},
+			        #{email},
+			        #{type},
+			        #{status},
+			        #{createTime},
+			        #{roleId})
+		]]>
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			<![CDATA[
+				SELECT @@IDENTITY AS id
+			]]>
+		</selectKey>
+	</insert>
+	
+	<update id="update" parameterType="employee">
+		<![CDATA[
+			UPDATE `employee`
+			SET
+			  `name` = #{name},
+		]]>
+		<if test="password!=null and password!=''">
+			<![CDATA[
+				`password` = #{password},
+			]]>
+		</if>
+		<![CDATA[	  
+			  `email` = #{email},
+			  `status` = #{status},
+			  `update_time` = #{updateTime},
+			  `role_id` = #{roleId}
+			WHERE `id` = #{id}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM `employee` WHERE `id` = #{id}
+		]]>
+	</delete>
+</mapper>	

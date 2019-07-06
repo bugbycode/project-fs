@@ -1,0 +1,19 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /project
+spring:
+  mvc:
+    servlet:
+      load-on-startup: 1
+  server:
+    datasource:
+      url: jdbc:mysql://localhost:3306/project_fs?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true
+      username: fort
+      password: 2wsx3edc
+      driverClassName: com.mysql.jdbc.Driver
+  thymeleaf:
+    cache: false
+    mode: LEGACYHTML5
+logging:
+  config: classpath:log4j2.xml        

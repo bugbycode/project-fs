@@ -1,0 +1,63 @@
+package com.fort.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.fort.authentication.ProjectAuthenticationFailureHandler;
+import com.fort.authentication.ProjectAuthenticationSuccessHandler;
+import com.fort.authentication.ProjectUsernamePasswordAuthenticationFilter;
+
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+	
+	private final String defaultFailureUrl = "/login?error";
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	private AuthenticationFailureHandler authenticationFailureHandler;
+	
+	@Autowired
+	private AuthenticationSuccessHandler authenticationSuccessHandler;
+	
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.authorizeRequests().antMatchers("/imgCode").permitAll()
+		
+		.antMatchers("/layout","/employee/*").hasRole(RoleConfig.LOGIN_USER) //主界面所有登录用户均可访问
+		
+		.and().headers().frameOptions().disable()
+		
+		//用户登录页面 所有人均可访问
+		.and().formLogin().loginPage("/login").permitAll()
+		.and().logout().invalidateHttpSession(true)
+		.and().addFilterBefore(getUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+	}
+	
+	@Bean("authenticationFailureHandler")
+	public AuthenticationFailureHandler getAuthenticationFailureHandler() {
+		return new ProjectAuthenticationFailureHandler(defaultFailureUrl);
+	}
+	
+	@Bean("authenticationSuccessHandler")
+	public AuthenticationSuccessHandler getAuthenticationSuccessHandler() {
+		return new ProjectAuthenticationSuccessHandler();
+	}
+	
+	@Bean
+	public UsernamePasswordAuthenticationFilter getUsernamePasswordAuthenticationFilter() {
+		UsernamePasswordAuthenticationFilter authFilter = new ProjectUsernamePasswordAuthenticationFilter();
+		authFilter.setAuthenticationManager(authenticationManager);
+		authFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
+		authFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
+		return authFilter;
+	}
+}
