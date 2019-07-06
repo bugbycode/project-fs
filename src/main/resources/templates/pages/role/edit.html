@@ -59,7 +59,17 @@
 	<!-- ================== END PAGE LEVEL JS ================== -->
 	<script type="text/javascript" th:src="@{/javascript/custom/bugbycode.js}"></script>
 	
-	
+	<style type="text/css">
+		.checkboxRowHeight{
+			height: 30px;
+		}
+		.checkboxSplitLine{
+			height:1px;
+			border:none;
+			border-top:1px dashed #111111;
+			border-top-color: #007aff;
+		}
+	</style>
 </head>
 <body>
 	<!-- begin #page-loader -->
@@ -74,21 +84,21 @@
 		
 		<!-- begin #sidebar -->
 		<!-- 左侧菜单 -->
-		<div th:include="pages/layout/left :: left('employee','employee')"></div>
+		<div th:include="pages/layout/left :: left('employee','role')"></div>
 		<!-- end #sidebar -->
 		
 		<!-- begin #content -->
 		<div id="content" class="content">
-			<form id="empForm" data-parsley-validate="true" th:object="${emp}" method="post" th:action="@{/} + *{id eq 0 ? 'employee/insert' : 'employee/update'}" autocomplete="off">
+			<form id="roleForm" data-parsley-validate="true" th:object="${r}" method="post" th:action="@{/} + *{id eq 0 ? 'role/insert' : 'role/update'}" autocomplete="off">
 				<input type="hidden" th:field="*{id}" />
 				<!-- begin breadcrumb -->
 				<ol class="breadcrumb pull-right">
-					<li class="breadcrumb-item">用户管理</li>
+					<li class="breadcrumb-item">角色管理</li>
 					<li class="breadcrumb-item">
-						<a data-toggle="ajax" th:href="@{/employee/query}">用户信息</a>
+						<a data-toggle="ajax" th:href="@{/role/query}">角色信息</a>
 					</li>
-					<li class="breadcrumb-item active" th:text="*{id > 0 ? '编辑用户' : '添加用户'}">
-						查看用户
+					<li class="breadcrumb-item active" th:text="*{id > 0 ? '编辑角色' : '添加角色'}">
+						查看角色
 					</li>
 				</ol>
 				<!-- end breadcrumb -->
@@ -108,94 +118,95 @@
 							</div>
 							<div class="panel panel-body">
 								<div class="form-group row m-b-15">
-									<label class="col-form-label col-md-3">姓名 <span class="text-danger">*</span></label>
+									<label class="col-form-label col-md-3">角色名称 <span class="text-danger">*</span></label>
 									<div class="col-md-9">
 										<input type="text" name="name" th:value="*{name}" class="form-control m-b-5" 
-											placeholder="请输入姓名"  data-parsley-required="true" data-parsley-required-message="请输入姓名" 
-											data-parsley-length="[2,20]" data-parsley-length-message="姓名长度不能少于两个字符且不能超过二十个字符"
-											data-parsley-pattern="^[A-Za-z0-9\u4e00-\u9fa5]*" data-parsley-pattern-message="姓名不能包含英文特殊字符"
+											th:readonly="*{type eq 0 ? 'true' : 'false'}"
+											placeholder="请输入角色名称"  data-parsley-required="true" data-parsley-required-message="请输入角色名称" 
+											data-parsley-length="[2,20]" data-parsley-length-message="角色名称长度不能少于两个字符且不能超过十个字符"
+											data-parsley-pattern="^[A-Za-z0-9\u4e00-\u9fa5]*" data-parsley-pattern-message="角色名称不能包含英文特殊字符"
 											/>
 									</div>
 								</div>
 								<div class="form-group row m-b-15">
-									<label class="col-form-label col-md-3">状态</label>
+									<label class="col-form-label col-md-3">描述信息</label>
 									<div class="col-md-9">
-										<select name="status" class="form-control m-b-5">
-											<option value="1" th:selected="*{status==1 ? 'true' : 'false'}">激活</option>
-											<option value="0" th:selected="*{status==0 ? 'true' : 'false'}">锁定</option>
-										</select>
-									</div>
-								</div>
-								<div class="form-group row m-b-15">
-									<label class="col-form-label col-md-3">所属角色</label>
-									<div class="col-md-9">
-										<select id="roleId" name="roleId" class="form-control m-b-5">
-											<option th:if="*{roleId ne 0}" th:value="*{roleId}" selected="selected" th:text="*{roleName}"></option>
-											<option th:if="*{roleId eq 0}" th:value="*{roleId}" selected="selected" th:text="'请选择角色'"></option>
-										</select>
-									</div>
-								</div>
-								<div class="form-group row m-b-15">
-									<label class="col-form-label col-md-3">Email</label>
-									<div class="col-md-9">
-										<input type="text" name="email" th:value="*{email}" class="form-control m-b-5" placeholder="请输入邮箱账号"
-										data-parsley-type="email" data-parsley-type-message="Email格式不正确"
-										data-parsley-maxlength="30" data-parsley-maxlength-message="Email长度不能超过三十个字符"
-										/>
+										<textarea class="form-control" style="userize:none" th:readonly="*{type eq 0 ? 'true' : 'false'}" rows="6" th:text="*{description}" placeholder="请输入角色描述信息"></textarea>
 									</div>
 								</div>
 								<div class="row form-group m-b-10">
 									<label class="col-md-3 col-form-label"></label>
 									<div class="col-md-9">
 										<button type="submit" class="btn btn-sm btn-primary m-r-5">提交</button>
-										<button type="button" class="btn btn-sm btn-default m-r-5" th:onclick="'location.href=\'' + @{/} + 'employee/query\';'">返回</button>
+										<button type="button" class="btn btn-sm btn-default m-r-5" th:onclick="'location.href=\'' + @{/} + 'role/query\';'">返回</button>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
+					<!-- 用户管理权限 -->
 					<div class="col-lg-6">
 						<div class="panel-inverse">
 							<div class="panel-heading">
 								<div class="panel-heading-btn">
 									
 								</div>
-								<h4 class="panel-title">认证信息</h4>
+								<h4 class="panel-title">用户管理</h4>
 							</div>
 							<div class="panel panel-body">
-								<div class="form-group row m-b-15">
-									<label class="col-form-label col-md-3">用户名 <span class="text-danger">*</span></label>
-									<div class="col-md-9">
-										<input type="text" id="username" name="username" th:readonly="*{id > 0}" th:value="*{username}" class="form-control m-b-5" placeholder="请输入用户名"
-										data-parsley-required="true" data-parsley-required-message="请输入用户名" 
-										data-parsley-length="[2,20]" data-parsley-length-message="用户名长度不能少于两个字符且不能超过二十个字符"
-										data-parsley-pattern="^[A-Za-z0-9_-]*" data-parsley-pattern-message="用户名不能包含除大小写字母、数字、下划线以及横杠以外的字符"
-										data-parsley-checkusername data-parsley-checkusername-message="该用户名已被使用"
-										/>
+								<!-- 用户管理 -->
+								<div class="form-group row m-b-10">
+									<div class="col-md-5">
+										<div class="checkbox checkbox-css">
+											<input type="checkbox" value="" id="checkAllUserRole" 
+												 />
+											<label th:for="*{type eq 1 ? 'checkAllUserRole' : ''}">用户信息</label>
+										</div>
+									</div>
+									<div class="col-md-7">
+										<div class="row checkboxRowHeight">
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="USER_QUERY" id="userQuery"  />
+												<label  th:for="*{type eq 1 ? 'userQuery' : ''}">查看用户</label>
+											</div>
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="USER_INSERT" id="userInsert"  />
+												<label  th:for="*{type eq 1 ? 'userInsert' : ''}">添加用户</label>
+											</div>
+										</div>
+										<div class="row checkboxRowHeight">
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="USER_UPDATE" id="userUpdate"  />
+												<label  th:for="*{type eq 1 ? 'userUpdate' : ''}">修改用户</label>
+											</div>
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="USER_DELETE" id="userDelete" />
+												<label  th:for="*{type eq 1 ? 'userDelete' : ''}">删除用户</label>
+											</div>
+										</div>
 									</div>
 								</div>
-								<div class="form-group row m-b-15">
-									<label class="col-form-label col-md-3">密码 <span class="text-danger">*</span></label>
-									<div class="col-md-9">
-										<input type="password" id="password" name="password" class="form-control m-b-5" placeholder="请输入密码" 
-										th:data-parsley-required="*{id eq 0 ? 'true' : 'false'}" data-parsley-required-message="请输入密码"
-										data-parsley-maxlength="16" data-parsley-maxlength-message="密码长度不能超过十六个字符"
-										/>
-									</div>
-								</div>
-								<div class="form-group row m-b-15">
-									<label class="col-form-label col-md-3">确认密码 <span class="text-danger">*</span></label>
-									<div class="col-md-9">
-										<input type="password" id="password2" name="password2" class="form-control m-b-5" placeholder="请确认密码" 
-											data-parsley-required="false" data-parsley-required-message="请确认密码"
-											data-parsley-equalto="#password" data-parsley-equalto-message="两次输入的密码不一致"
-										/>
-									</div>
-								</div>
+								<div class="checkboxSplitLine"></div>
 							</div>
-						</div>	
+						</div>
 					</div>
 				</div>
+				<!-- 权限信息 -->
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="panel-inverse">
+							<div class="panel-heading">
+								<div class="panel-heading-btn">
+									
+								</div>
+								<h4 class="panel-title">项目管理</h4>
+							</div>
+							<div class="panel panel-body">
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 权限信息 end -->
 			</form>
 		</div>
 		<!-- end #content -->
@@ -211,7 +222,7 @@
 	<script th:src="@{/assets/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
 	<!--[if lt IE 9]>
 		<script th:src="@{/assets/crossbrowserjs/html5shiv.js}"></script>
-		<script th:src="@{/assets/crossbrowserjs/respond.min.js}"></script>
+		<script th:src="@{/assets/crossbrowserjs/userpond.min.js}"></script>
 		<script th:src="@{/assets/crossbrowserjs/excanvas.min.js}"></script>
 	<![endif]-->
 	<script th:src="@{/assets/plugins/slimscroll/jquery.slimscroll.min.js}"></script>
@@ -249,57 +260,17 @@
 	<!-- ================== END PAGE LEVEL JS ================== -->
 	<script type="text/javascript" th:inline="javascript">
 		var rootPath = [[@{/}]];
-		function select2Format(selector,url,defaultText){
-			$(selector).select2({
-				width:'100%',
-				ajax:{
-		    		type:"get",
-		    		url: function (params) {
-	    				var value = params.term;
-	    				if(value == undefined){
-	    					value = "";
-	    				}
-	    		      	return url + value;
-	    		    },processResults:function(data,params){
-	    		    	var result = [{id:0,text:defaultText}];
-	    		    	$.each(data,function(index,item){
-	    		    		result.push({
-	    		    			id:item.id,
-	    		    			text:item.name
-	    		    		});
-	    		    	});
-	    		    	var rs = {
-	   		    			results:result
-	    		    	};
-	    		    	return rs;
-	    		    }
-		    	}
-			});
-		}
-		if([[${emp.type}]] == 1){
-			select2Format("#roleId",rootPath + "employee/queryRole?roleName=","请选择角色");
-		}
 		
-		$("#password").change(function(){
-			var value = $(this).val();
-			if(value != ''){
-				$("#password2").attr("data-parsley-required",true);
-			}else{
-				$("#password2").attr("data-parsley-required",false);
-			}
-			$('#password2').parsley().validate();
-		});
-		
-		window.Parsley.addValidator('checkusername',{
+		window.Parsley.addValidator('checkrolename',{
 			validateString:function(value){
 				var flag = false;
 				$.ajax({
-					url:rootPath + 'employee/checkUserName',
-					data:'userName=' + value,
+					url:rootPath + 'role/checkRoleName',
+					data:'roleName=' + value,
 					dataType:'json',
 					async:false,
 					success:function(result){
-						if(result.empId == 0 || result.empId == [[${emp.id}]]){
+						if(result.roleId == 0 || result.roleId == [[${r.id}]]){
 							flag = true;
 						}else{
 							flag = false;

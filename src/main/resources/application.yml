@@ -8,9 +8,9 @@ spring:
       load-on-startup: 1
   server:
     datasource:
-      url: jdbc:mysql://dev.server:3306/project_fs?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true
+      url: jdbc:mysql://localhost:3306/project_fs?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true
       username: fort
-      password: Cl0vdsec.mysql
+      password: 2wsx3edc
       driverClassName: com.mysql.jdbc.Driver
   thymeleaf:
     cache: false

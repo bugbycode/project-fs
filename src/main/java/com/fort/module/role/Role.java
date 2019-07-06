@@ -87,4 +87,14 @@ public class Role implements Serializable {
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
+	
+	public void copy(Role r) {
+		this.setId(r.getId());
+		this.setName(r.getName());
+		this.setDescription(r.getDescription());
+		this.setGrantedAuthority(r.getGrantedAuthority());
+		this.setType(r.getType());
+		this.setCreateTime(r.getCreateTime());
+		this.setUpdateTime(r.getUpdateTime());
+	}
 }

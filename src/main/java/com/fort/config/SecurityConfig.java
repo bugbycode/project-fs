@@ -32,7 +32,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests().antMatchers("/imgCode").permitAll()
 		
-		.antMatchers("/layout","/employee/*").hasRole(RoleConfig.LOGIN_USER) //主界面所有登录用户均可访问
+		.antMatchers("/employee/query","/employee/edit","/employee/checkUserName",
+				"/employee/queryRole")
+		.hasAnyRole(RoleConfig.USER_QUERY,
+				RoleConfig.USER_INSERT,RoleConfig.USER_UPDATE,RoleConfig.USER_DELETE) //主界面所有登录用户均可访问
+		.antMatchers("/employee/insert").hasRole(RoleConfig.USER_INSERT)
+		.antMatchers("/employee/update").hasRole(RoleConfig.USER_UPDATE)
+		.antMatchers("/employee/delete").hasRole(RoleConfig.USER_DELETE)
+		
+		.antMatchers("/role/*").hasAnyRole(RoleConfig.LOGIN_USER)
 		
 		.and().headers().frameOptions().disable()
 		

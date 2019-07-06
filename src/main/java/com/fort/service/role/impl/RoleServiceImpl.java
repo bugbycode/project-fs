@@ -42,6 +42,7 @@ public class RoleServiceImpl implements RoleService {
 			page.setTotalCount(totalCount);
 			sr.setList(roleDao.query(params));
 		}
+		sr.setPage(page);
 		return sr;
 	}
 
