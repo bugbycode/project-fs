@@ -100,6 +100,7 @@ public class EmployeeController {
 		emp.setType(e.getType());
 		if(e.getType() == 0 || empId == user.getId()) {
 			emp.setStatus(e.getStatus());
+			emp.setRoleId(e.getRoleId());
 		}
 		employeeService.update(emp);
 		return "redirect:/employee/query";
