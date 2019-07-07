@@ -11,7 +11,7 @@
 					<li th:class="${page=='employee'} ? 'has-sub active' : 'has-sub'" class="has-sub">
 						<a href="javascript:;">
 							<b class="caret"></b>
-							<i class="ion-ios-pulse"></i>
+							<i class="ion-ios-people bg-blue"></i>
 							<span>用户管理</span>
 						</a>
 						<ul class="sub-menu">
@@ -32,12 +32,16 @@
 							<li><a href="email_detail.html">Detail</a></li>
 						</ul>
 					</li> -->
-					<li class="has-sub">
+					<li th:class="${page=='project'} ? 'has-sub active' : 'has-sub'" class="has-sub">
 						<a href="#">
-							<i class="ion-ios-nutrition bg-blue"></i>
-							<span>项目信息</span> 
-							<!-- <span>Widgets <span class="label label-theme m-l-5">NEW</span></span> --> 
+							<b class="caret"></b>
+							<i class="ion-ios-apps bg-blue"></i>
+							<span>项目管理</span> 
 						</a>
+						<ul class="sub-menu">
+							<li th:class="${menu=='project' ? 'active' : ''}"><a th:href="@{/project/query}">项目信息</a></li>
+							<li th:class="${menu=='upgrad' ? 'active' : ''}"><a th:href="@{/upgrade/query}">技术支持</a></li>
+						</ul>
 					</li>
 					
 					<!-- begin sidebar minify button -->
