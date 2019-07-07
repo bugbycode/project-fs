@@ -14,4 +14,10 @@ public interface RoleDao {
 	public List<Role> query(Map<String,Object> params);
 	
 	public int count(Map<String,Object> params);
+
+	public int insert(Role r);
+
+	public void update(Role r);
+
+	public void delete(int roleId);
 }

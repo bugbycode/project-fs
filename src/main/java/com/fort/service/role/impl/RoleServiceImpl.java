@@ -1,5 +1,6 @@
 package com.fort.service.role.impl;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,24 @@ public class RoleServiceImpl implements RoleService {
 		params.put("limit", 10);
 		params.put("offset", 0);
 		return roleDao.query(params);
+	}
+
+	@Override
+	public int insert(Role r) {
+		r.setType(1);
+		r.setCreateTime(new Date());
+		return roleDao.insert(r);
+	}
+
+	@Override
+	public void update(Role r) {
+		r.setUpdateTime(new Date());
+		roleDao.update(r);
+	}
+
+	@Override
+	public void delete(Integer roleId) {
+		roleDao.delete(roleId);
 	}
 
 }

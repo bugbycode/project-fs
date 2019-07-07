@@ -1,7 +1,6 @@
 package com.fort.service.role;
 
 import java.util.List;
-import java.util.Map;
 
 import com.fort.module.role.Role;
 import com.util.page.SearchResult;
@@ -15,4 +14,10 @@ public interface RoleService {
 	public SearchResult<Role> query(String paramQuery,int offset,int limit);
 	
 	public List<Role> query(String roleName);
+
+	public int insert(Role r);
+
+	public void update(Role r);
+
+	public void delete(Integer roleId);
 }

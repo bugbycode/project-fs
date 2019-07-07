@@ -32,4 +32,19 @@ public class RoleDaoImpl extends BaseDao implements RoleDao {
 		return getSqlSession().selectOne("role.count", params);
 	}
 
+	@Override
+	public int insert(Role r) {
+		return getSqlSession().insert("role.insert", r);
+	}
+
+	@Override
+	public void update(Role r) {
+		getSqlSession().update("role.update", r);
+	}
+
+	@Override
+	public void delete(int roleId) {
+		getSqlSession().delete("role.delete", roleId);
+	}
+
 }

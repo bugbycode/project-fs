@@ -125,30 +125,61 @@
 											placeholder="请输入角色名称"  data-parsley-required="true" data-parsley-required-message="请输入角色名称" 
 											data-parsley-length="[2,20]" data-parsley-length-message="角色名称长度不能少于两个字符且不能超过十个字符"
 											data-parsley-pattern="^[A-Za-z0-9\u4e00-\u9fa5]*" data-parsley-pattern-message="角色名称不能包含英文特殊字符"
+											data-parsley-checkrolename data-parsley-checkrolename-message="该角色名已被使用"
 											/>
 									</div>
 								</div>
 								<div class="form-group row m-b-15">
 									<label class="col-form-label col-md-3">描述信息</label>
 									<div class="col-md-9">
-										<textarea class="form-control" style="userize:none" th:readonly="*{type eq 0 ? 'true' : 'false'}" rows="6" th:text="*{description}" placeholder="请输入角色描述信息"></textarea>
+										<textarea name="description" class="form-control" style="userize:none" th:readonly="*{type eq 0 ? 'true' : 'false'}" rows="6" th:text="*{description}" placeholder="请输入角色描述信息"></textarea>
 									</div>
 								</div>
 								<div class="row form-group m-b-10">
 									<label class="col-md-3 col-form-label"></label>
 									<div class="col-md-9">
-										<button type="submit" class="btn btn-sm btn-primary m-r-5">提交</button>
+										<button type="submit" class="btn btn-sm btn-primary m-r-5" th:disabled="*{type eq 0 ? 'true' : 'false'}">提交</button>
 										<button type="button" class="btn btn-sm btn-default m-r-5" th:onclick="'location.href=\'' + @{/} + 'role/query\';'">返回</button>
 									</div>
 								</div>
 							</div>
 						</div>
+						<!-- 操作记录 -->
+						<div class="panel-inverse">
+							<div class="panel-heading">
+								<div class="panel-heading-btn">
+									
+								</div>
+								<h4 class="panel-title">操作记录</h4>
+							</div>
+							<div class="panel panel-body">
+								<div class="form-group row m-b-10">
+									<div class="col-md-5">
+										<div class="checkbox checkbox-css">
+											<input type="checkbox" value="" id="checkAllLogRole" 
+												th:checked="*{#lists.contains(grantSet,'LOG_QUERY')}"
+												 />
+											<label th:for="*{type eq 1 ? 'checkAllLogRole' : ''}">操作记录</label>
+										</div>
+									</div>
+									<div class="col-md-7">
+										<div class="row checkboxRowHeight">
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="LOG_QUERY" id="logQuery" th:checked="*{#lists.contains(grantSet,'LOG_QUERY')}" />
+												<label  th:for="*{type eq 1 ? 'logQuery' : ''}">查看记录</label>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- 操作记录END -->
 					</div>
 					<!-- 用户管理权限 -->
 					<div class="col-lg-6">
 						<div class="panel-inverse">
 							<div class="panel-heading">
-								<div class="panel-heading-btn">
+								<div class="panel-heading-btn" >
 									
 								</div>
 								<h4 class="panel-title">用户管理</h4>
@@ -159,6 +190,9 @@
 									<div class="col-md-5">
 										<div class="checkbox checkbox-css">
 											<input type="checkbox" value="" id="checkAllUserRole" 
+												th:checked="*{#lists.contains(grantSet,'USER_QUERY') && #lists.contains(grantSet,'USER_INSERT') 
+														&& #lists.contains(grantSet,'USER_UPDATE')
+													  && #lists.contains(grantSet,'USER_DELETE')}"
 												 />
 											<label th:for="*{type eq 1 ? 'checkAllUserRole' : ''}">用户信息</label>
 										</div>
@@ -166,34 +200,65 @@
 									<div class="col-md-7">
 										<div class="row checkboxRowHeight">
 											<div class="checkbox checkbox-css checkbox-inline">
-												<input name="grantedAuthority" type="checkbox" value="USER_QUERY" id="userQuery"  />
+												<input name="grantedAuthority" type="checkbox" value="USER_QUERY" id="userQuery" th:checked="*{#lists.contains(grantSet,'USER_QUERY')}" />
 												<label  th:for="*{type eq 1 ? 'userQuery' : ''}">查看用户</label>
 											</div>
 											<div class="checkbox checkbox-css checkbox-inline">
-												<input name="grantedAuthority" type="checkbox" value="USER_INSERT" id="userInsert"  />
+												<input name="grantedAuthority" type="checkbox" value="USER_INSERT" id="userInsert" th:checked="*{#lists.contains(grantSet,'USER_INSERT')}"/>
 												<label  th:for="*{type eq 1 ? 'userInsert' : ''}">添加用户</label>
 											</div>
 										</div>
 										<div class="row checkboxRowHeight">
 											<div class="checkbox checkbox-css checkbox-inline">
-												<input name="grantedAuthority" type="checkbox" value="USER_UPDATE" id="userUpdate"  />
+												<input name="grantedAuthority" type="checkbox" value="USER_UPDATE" id="userUpdate" th:checked="*{#lists.contains(grantSet,'USER_UPDATE')}"/>
 												<label  th:for="*{type eq 1 ? 'userUpdate' : ''}">修改用户</label>
 											</div>
 											<div class="checkbox checkbox-css checkbox-inline">
-												<input name="grantedAuthority" type="checkbox" value="USER_DELETE" id="userDelete" />
+												<input name="grantedAuthority" type="checkbox" value="USER_DELETE" id="userDelete" th:checked="*{#lists.contains(grantSet,'USER_DELETE')}"/>
 												<label  th:for="*{type eq 1 ? 'userDelete' : ''}">删除用户</label>
 											</div>
 										</div>
 									</div>
 								</div>
 								<div class="checkboxSplitLine"></div>
+								<div class="form-group row m-b-10">
+									<div class="col-md-5">
+										<div class="checkbox checkbox-css">
+											<input type="checkbox" value="" id="checkAllRoleRole" 
+												th:checked="*{#lists.contains(grantSet,'ROLES_QUERY') && #lists.contains(grantSet,'ROLES_INSERT') 
+														&& #lists.contains(grantSet,'ROLES_UPDATE')
+													  && #lists.contains(grantSet,'ROLES_DELETE')}"
+												 />
+											<label th:for="*{type eq 1 ? 'checkAllRoleRole' : ''}">角色信息</label>
+										</div>
+									</div>
+									<div class="col-md-7">
+										<div class="row checkboxRowHeight">
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="ROLES_QUERY" id="roleQuery" th:checked="*{#lists.contains(grantSet,'ROLES_QUERY')}" />
+												<label  th:for="*{type eq 1 ? 'roleQuery' : ''}">查看角色</label>
+											</div>
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="ROLES_INSERT" id="roleInsert" th:checked="*{#lists.contains(grantSet,'ROLES_INSERT')}"/>
+												<label  th:for="*{type eq 1 ? 'roleInsert' : ''}">添加角色</label>
+											</div>
+										</div>
+										<div class="row checkboxRowHeight">
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="ROLES_UPDATE" id="roleUpdate" th:checked="*{#lists.contains(grantSet,'ROLES_UPDATE')}"/>
+												<label  th:for="*{type eq 1 ? 'roleUpdate' : ''}">修改角色</label>
+											</div>
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="ROLES_DELETE" id="roleDelete" th:checked="*{#lists.contains(grantSet,'ROLES_DELETE')}"/>
+												<label  th:for="*{type eq 1 ? 'roleDelete' : ''}">删除角色</label>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
-				</div>
-				<!-- 权限信息 -->
-				<div class="row">
-					<div class="col-lg-6">
+						<!-- 用户管理 END -->
+						<!-- 项目管理 -->
 						<div class="panel-inverse">
 							<div class="panel-heading">
 								<div class="panel-heading-btn">
@@ -202,11 +267,80 @@
 								<h4 class="panel-title">项目管理</h4>
 							</div>
 							<div class="panel panel-body">
+								<div class="form-group row m-b-10">
+									<div class="col-md-5">
+										<div class="checkbox checkbox-css">
+											<input type="checkbox" value="" id="checkAllProjectRole" 
+												th:checked="*{#lists.contains(grantSet,'PROJECT_QUERY') && #lists.contains(grantSet,'PROJECT_INSERT') 
+														&& #lists.contains(grantSet,'PROJECT_UPDATE')
+													  && #lists.contains(grantSet,'PROJECT_DELETE')}"
+												 />
+											<label th:for="*{type eq 1 ? 'checkAllProjectRole' : ''}">项目信息</label>
+										</div>
+									</div>
+									<div class="col-md-7">
+										<div class="row checkboxRowHeight">
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="PROJECT_QUERY" id="projectQuery" th:checked="*{#lists.contains(grantSet,'PROJECT_QUERY')}" />
+												<label  th:for="*{type eq 1 ? 'projectQuery' : ''}">查看项目</label>
+											</div>
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="PROJECT_INSERT" id="projectInsert" th:checked="*{#lists.contains(grantSet,'PROJECT_INSERT')}"/>
+												<label  th:for="*{type eq 1 ? 'projectInsert' : ''}">添加项目</label>
+											</div>
+										</div>
+										<div class="row checkboxRowHeight">
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="PROJECT_UPDATE" id="projectUpdate" th:checked="*{#lists.contains(grantSet,'PROJECT_UPDATE')}"/>
+												<label  th:for="*{type eq 1 ? 'projectUpdate' : ''}">修改项目</label>
+											</div>
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="PROJECT_DELETE" id="projectDelete" th:checked="*{#lists.contains(grantSet,'PROJECT_DELETE')}"/>
+												<label  th:for="*{type eq 1 ? 'projectDelete' : ''}">删除项目</label>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="checkboxSplitLine"></div>
+								<div class="form-group row m-b-10">
+									<div class="col-md-5">
+										<div class="checkbox checkbox-css">
+											<input type="checkbox" value="" id="checkAllUpgradRole" 
+												th:checked="*{#lists.contains(grantSet,'UPGRAD_QUERY') && #lists.contains(grantSet,'UPGRAD_INSERT') 
+														&& #lists.contains(grantSet,'UPGRAD_UPDATE')
+													  && #lists.contains(grantSet,'UPGRAD_DELETE')}"
+												 />
+											<label th:for="*{type eq 1 ? 'checkAllUpgradRole' : ''}">技术支持</label>
+										</div>
+									</div>
+									<div class="col-md-7">
+										<div class="row checkboxRowHeight">
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="UPGRAD_QUERY" id="upgradQuery" th:checked="*{#lists.contains(grantSet,'UPGRAD_QUERY')}" />
+												<label  th:for="*{type eq 1 ? 'upgradQuery' : ''}">查看记录</label>
+											</div>
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="UPGRAD_INSERT" id="upgradInsert" th:checked="*{#lists.contains(grantSet,'UPGRAD_INSERT')}"/>
+												<label  th:for="*{type eq 1 ? 'upgradInsert' : ''}">添加记录</label>
+											</div>
+										</div>
+										<div class="row checkboxRowHeight">
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="UPGRAD_UPDATE" id="upgradUpdate" th:checked="*{#lists.contains(grantSet,'UPGRAD_UPDATE')}"/>
+												<label  th:for="*{type eq 1 ? 'upgradUpdate' : ''}">修改记录</label>
+											</div>
+											<div class="checkbox checkbox-css checkbox-inline">
+												<input name="grantedAuthority" type="checkbox" value="UPGRAD_DELETE" id="upgradDelete" th:checked="*{#lists.contains(grantSet,'UPGRAD_DELETE')}"/>
+												<label  th:for="*{type eq 1 ? 'upgradDelete' : ''}">删除记录</label>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
+						<!-- 项目管理 END-->
 					</div>
 				</div>
-				<!-- 权限信息 end -->
 			</form>
 		</div>
 		<!-- end #content -->
@@ -260,7 +394,7 @@
 	<!-- ================== END PAGE LEVEL JS ================== -->
 	<script type="text/javascript" th:inline="javascript">
 		var rootPath = [[@{/}]];
-		
+		var type = [[${r.type}]];
 		window.Parsley.addValidator('checkrolename',{
 			validateString:function(value){
 				var flag = false;
@@ -281,6 +415,43 @@
 			}
 		});
 		
+		if(type == 1){
+			$("#checkAllUserRole").click(function(){
+				var checked = $(this).prop("checked");
+				$("#userQuery").prop("checked",checked);
+				$("#userInsert").prop("checked",checked);
+				$("#userUpdate").prop("checked",checked);
+				$("#userDelete").prop("checked",checked);
+			});
+			$("#checkAllRoleRole").click(function(){
+				var checked = $(this).prop("checked");
+				$("#roleQuery").prop("checked",checked);
+				$("#roleInsert").prop("checked",checked);
+				$("#roleUpdate").prop("checked",checked);
+				$("#roleDelete").prop("checked",checked);
+			});
+			
+			$("#checkAllProjectRole").click(function(){
+				var checked = $(this).prop("checked");
+				$("#projectQuery").prop("checked",checked);
+				$("#projectInsert").prop("checked",checked);
+				$("#projectUpdate").prop("checked",checked);
+				$("#projectDelete").prop("checked",checked);
+			});
+			
+			$("#checkAllUpgradRole").click(function(){
+				var checked = $(this).prop("checked");
+				$("#upgradQuery").prop("checked",checked);
+				$("#upgradInsert").prop("checked",checked);
+				$("#upgradUpdate").prop("checked",checked);
+				$("#upgradDelete").prop("checked",checked);
+			});
+			
+			$("#checkAllLogRole").click(function(){
+				var checked = $(this).prop("checked");
+				$("#logQuery").prop("checked",checked);
+			});
+		}
 	</script>
 </body>
 </html>

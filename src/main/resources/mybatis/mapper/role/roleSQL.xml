@@ -88,4 +88,41 @@
 			FROM `role` WHERE `name` = #{name}
 		]]>
 	</select>
+	
+	<insert id="insert" parameterType="role">
+		<![CDATA[
+			INSERT INTO `role` (
+			  `name`,
+			  `description`,
+			  `granted_authority`,
+			  `type`,
+			  `create_time`
+			) VALUES (
+			    #{name},
+			    #{description},
+			    #{grantedAuthority},
+			    #{type},
+			    #{createTime}
+			  )
+		]]>
+	</insert>
+	
+	<update id="update" parameterType="role">
+		<![CDATA[
+			UPDATE 
+			 `role` 
+			SET
+			  `name` = #{name},
+			  `description` = #{description},
+			  `granted_authority` = #{grantedAuthority},
+			  `update_time` = #{updateTime} 
+			WHERE `id` = #{id} 
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM `role` WHERE `id` = #{id}
+		]]>
+	</delete>
 </mapper>  

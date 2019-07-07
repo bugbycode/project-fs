@@ -2,10 +2,13 @@ package com.fort.module.role;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import org.springframework.util.StringUtils;
 
 public class Role implements Serializable {
 
@@ -25,7 +28,7 @@ public class Role implements Serializable {
 	private String description;
 	
 	private String grantedAuthority;
-
+	
 	private int type;
 	
 	private Date createTime;
@@ -62,6 +65,10 @@ public class Role implements Serializable {
 
 	public void setGrantedAuthority(String grantedAuthority) {
 		this.grantedAuthority = grantedAuthority;
+	}
+
+	public Set<String> getGrantSet() {
+		return StringUtils.commaDelimitedListToSet(this.grantedAuthority);
 	}
 
 	public int getType() {

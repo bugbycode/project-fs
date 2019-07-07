@@ -40,7 +40,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/employee/update").hasRole(RoleConfig.USER_UPDATE)
 		.antMatchers("/employee/delete").hasRole(RoleConfig.USER_DELETE)
 		
-		.antMatchers("/role/*").hasAnyRole(RoleConfig.LOGIN_USER)
+		//角色管理
+		.antMatchers("/role/query","/role/edit","/role/checkRoleName").hasAnyRole(RoleConfig.ROLE_QUERY,
+				RoleConfig.ROLE_INSERT,RoleConfig.ROLE_UPDATE,RoleConfig.ROLE_DELETE)
+		.antMatchers("/role/insert").hasRole(RoleConfig.ROLE_INSERT)
+		.antMatchers("/role/update").hasRole(RoleConfig.ROLE_UPDATE)
+		.antMatchers("/role/delete").hasRole(RoleConfig.ROLE_DELETE)
 		
 		.and().headers().frameOptions().disable()
 		
