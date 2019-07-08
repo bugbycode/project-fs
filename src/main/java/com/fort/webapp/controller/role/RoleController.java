@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,6 +22,7 @@ import com.fort.service.role.RoleService;
 import com.util.StringUtil;
 import com.util.page.SearchResult;
 
+@Validated
 @Controller
 @RequestMapping("/role")
 public class RoleController {
@@ -68,7 +70,7 @@ public class RoleController {
 	}
 	
 	@RequestMapping(value = "/insert",method = {RequestMethod.POST})
-	public String insert(@ModelAttribute("r") Role r) {
+	public String insert(@Validated @ModelAttribute("r") Role r) {
 		Role role = roleService.queryByName(r.getName());
 		if(role != null) {
 			throw new RuntimeException("该角色名称已存在");
@@ -78,7 +80,7 @@ public class RoleController {
 	}
 	
 	@RequestMapping(value = "/update",method = {RequestMethod.POST})
-	public String update(@ModelAttribute("r") Role r) {
+	public String update(@Validated @ModelAttribute("r") Role r) {
 		Role role = roleService.queryByName(r.getName());
 		if(!(role == null || role.getId() == r.getId())) {
 			throw new RuntimeException("该角色名称已存在");

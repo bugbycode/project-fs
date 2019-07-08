@@ -132,7 +132,9 @@
 								<div class="form-group row m-b-15">
 									<label class="col-form-label col-md-3">描述信息</label>
 									<div class="col-md-9">
-										<textarea name="description" class="form-control" style="userize:none" th:readonly="*{type eq 0 ? 'true' : 'false'}" rows="6" th:text="*{description}" placeholder="请输入角色描述信息"></textarea>
+										<textarea name="description" class="form-control" style="resize:none" th:readonly="*{type eq 0 ? 'true' : 'false'}" rows="6" th:text="*{description}" placeholder="请输入角色描述信息"
+											data-parsley-maxlength="30" data-parsley-maxlength-message="角色描述信息不能超过三十个字符"
+										></textarea>
 									</div>
 								</div>
 								<div class="row form-group m-b-10">
