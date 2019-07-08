@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 
+<html lang="cn" class="ie8"
+ xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"> 
+<![endif]-->
+<!--[if !IE]><!-->
+<html lang="cn" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org" >
+<!--<![endif]-->
+<head>
+	<meta charset="utf-8" />
+	<title>项目信息管理平台</title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+	<meta content="" name="description" />
+	<meta content="" name="author" />
+	
+	<!-- ================== BEGIN BASE CSS STYLE ================== -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+	<link th:href="@{/assets/plugins/jquery-ui/jquery-ui.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/plugins/bootstrap/css/bootstrap.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/plugins/font-awesome/css/all.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/plugins/ionicons/css/ionicons.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/plugins/animate/animate.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/css/apple/style.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/css/apple/style-responsive.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/css/apple/theme/default.css}" rel="stylesheet" id="theme" />
+	<!-- ================== END BASE CSS STYLE ================== -->
+	
+	<link th:href="@{/assets/plugins/jstree/dist/themes/default/style.min.css}" rel="stylesheet" />
+	
+	<!-- ================== BEGIN BASE JS ================== -->
+	<script th:src="@{/assets/plugins/pace/pace.min.js}"></script>
+	<script th:src="@{/assets/plugins/jquery/jquery-3.3.1.min.js}"></script>
+	<!-- ================== END BASE JS ================== -->
+	<!-- ================== END PAGE LEVEL JS ================== -->
+	<script type="text/javascript" th:src="@{/javascript/custom/bugbycode.js}"></script>
+</head>
+<body>
+	<!-- begin #page-loader -->
+	<div id="page-loader" class="fade show"><span class="spinner"></span></div>
+	<!-- end #page-loader -->
+	
+	<!-- begin #page-container -->
+	<div id="page-container" class="page-container fade page-sidebar-fixed page-header-fixed">
+		<!-- begin #header -->
+		<div th:include="pages/layout/head :: head"></div>
+		<!-- end #header -->
+		
+		<!-- begin #sidebar -->
+		<!-- 左侧菜单 -->
+		<div th:include="pages/layout/left :: left('project','project')"></div>
+		<!-- end #sidebar -->
+		
+		<!-- begin #content -->
+		<div id="content" class="content">
+			<!-- begin breadcrumb -->
+			<ol class="breadcrumb pull-right">
+				<li class="breadcrumb-item">项目管理</li>
+				<li class="breadcrumb-item">
+					<a data-toggle="ajax" th:href="@{/project/query}">项目信息</a>
+				</li>
+				<li class="breadcrumb-item active">
+					项目维护
+				</li>
+			</ol>
+			<!-- end breadcrumb -->
+			<!-- begin page-header -->
+			<h1 class="page-header">&nbsp;<small></small></h1>
+			<!-- end page-header -->
+			
+			<div class="row">
+				<div class="col-lg-4">
+					<!-- begin panel -->
+					<div class="panel-inverse">
+						<div class="panel-heading">
+							<div class="panel-heading-btn">
+								
+							</div>
+							<h4 class="panel-title">项目信息</h4>
+						</div>
+						<div class="panel panel-body">
+							<div class="projectTree"></div>
+						</div>
+					</div>
+					<!-- end panel -->
+				</div>
+				<div class="col-lg-8">
+					<!-- begin panel -->
+					<div class="panel-inverse">
+						<div class="panel-heading">
+							<div class="panel-heading-btn">
+								
+							</div>
+							<h4 class="panel-title">文档信息</h4>
+						</div>
+						<div class="panel panel-body">
+							
+						</div>
+					</div>
+					<!-- end panel -->
+				</div>
+			</div>
+		</div>
+		<!-- end #content -->
+		
+		<!-- begin scroll to top btn -->
+		<a href="javascript:;" class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade" data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
+		<!-- end scroll to top btn -->
+	</div>
+	<!-- end page container -->
+	
+	<!-- #modal-dialog -->
+	<div class="modal fade" id="project-add-modal-dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">添加项目</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				</div>
+				<div class="modal-body">
+					<form action="" method="post" autocomplete="off">
+						<div class="form-group row m-b-15">
+							<label class="col-form-label col-md-3">项目名称 <span class="text-danger">*</span></label>
+							<div class="col-md-9">
+								<input type="text" name="name" th:value="*{name}" class="form-control m-b-5" 
+									placeholder="请输入项目名称"  data-parsley-required="true" data-parsley-required-message="请输入项目名称" 
+									data-parsley-length="[2,20]" data-parsley-length-message="姓名长度不能少于两个字符且不能超过二十个字符"
+									data-parsley-pattern="^[A-Za-z0-9\u4e00-\u9fa5]*" data-parsley-pattern-message="姓名不能包含英文特殊字符"
+									/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<a href="javascript:;" class="btn btn-white" data-dismiss="modal">关闭</a>
+					<a href="javascript:;" class="btn btn-success">提交</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- ================== BEGIN BASE JS ================== -->
+	<script th:src="@{/assets/plugins/jquery-ui/jquery-ui.min.js}"></script>
+	<script th:src="@{/assets/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<!--[if lt IE 9]>
+		<script th:src="@{/assets/crossbrowserjs/html5shiv.js}"></script>
+		<script th:src="@{/assets/crossbrowserjs/respond.min.js}"></script>
+		<script th:src="@{/assets/crossbrowserjs/excanvas.min.js}"></script>
+	<![endif]-->
+	<script th:src="@{/assets/plugins/slimscroll/jquery.slimscroll.min.js}"></script>
+	<script th:src="@{/assets/plugins/js-cookie/js.cookie.js}"></script>
+	<script th:src="@{/assets/js/theme/apple.min.js}"></script>
+	<script th:src="@{/assets/js/apps.min.js}"></script>
+	<!-- ================== END BASE JS ================== -->
+	<script th:src="@{/assets/plugins/jstree/dist/jstree.min.js}"></script>
+	<script type="text/javascript">
+		var rootPath = [[@{/}]];
+		$(".projectTree").jstree({
+			"core": {
+				"themes": {
+					"responsive": false
+				}, 
+				"check_callback": true,
+				'data': /*[{
+					id:1,
+					"text": "项目管理中心",
+					"children": [
+						{
+							id:2,
+							text:"堡垒主机"
+						},{
+							id:3,
+							text:"日志审计"
+						}
+					]
+				}
+			]*/
+			function (obj,callback){
+				 $.ajax({
+                      type: "GET",
+                      url: rootPath + "project/projectTree",
+                      dataType:"json",
+                      async: false,
+                      cache: false,
+                      success:function(result) {
+                    	  callback.call(this, result);
+                      }
+
+                  });
+			}
+			
+			},
+			"types": {
+				"default": {
+					"icon": "fa fa-folder text-warning fa-lg"
+				},
+				"file": {
+					"icon": "fa fa-file text-warning fa-lg"
+				}
+			},
+			"state": { "key": "demo2" },
+			"plugins": [ "contextmenu", "state", "types" ,"changed"],
+			"contextmenu":{
+				"items": {
+				    "create":{
+				    	 "label": "添加项目",
+				    	 "action": function(data){
+				    		 var inst = jQuery.jstree.reference(data.reference);
+				    	     var obj = inst.get_node(data.reference);
+				    	     $("#project-add-modal-dialog").modal("show");
+				    	 }
+				     },"rename":{
+				    	 "label": "修改名称",
+				    	 "action": function(data){
+				    		 var inst = jQuery.jstree.reference(data.reference);
+				    	     var obj = inst.get_node(data.reference);
+				    	 }
+				     },"delete":{
+				    	 "label": "删除项目",
+						 "action": function(data){
+							 var inst = $.jstree.reference(data.reference),
+								obj = inst.get_node(data.reference);
+							 if(inst.is_selected(obj)) {
+								inst.delete_node(inst.get_selected());
+							 } else {
+								inst.delete_node(obj);
+							 }
+				    	 }
+				     }
+				}
+			}
+		});
+		
+	</script>
+</body>
+</html>

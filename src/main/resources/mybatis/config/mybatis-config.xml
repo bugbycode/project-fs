@@ -11,5 +11,6 @@
 	<typeAliases>
 		<typeAlias alias="employee" type="com.fort.module.employee.Employee"/>
 		<typeAlias alias="role" type="com.fort.module.role.Role"/>
+		<typeAlias alias="project" type="com.fort.module.project.Project"/>
 	</typeAliases>
 </configuration>
