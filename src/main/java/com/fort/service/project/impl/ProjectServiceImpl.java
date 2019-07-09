@@ -5,9 +5,12 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.fort.dao.project.ProjectDao;
 import com.fort.module.project.Project;
+import com.fort.module.project.ProjectMemo;
+import com.fort.service.project.ProjectMemoService;
 import com.fort.service.project.ProjectService;
 
 @Service("projectService")
@@ -15,6 +18,9 @@ public class ProjectServiceImpl implements ProjectService {
 
 	@Autowired
 	private ProjectDao projectDao;
+	
+	@Autowired
+	private ProjectMemoService projectMemoService;
 	
 	@Override
 	public List<Project> query() {
@@ -42,6 +48,12 @@ public class ProjectServiceImpl implements ProjectService {
 	@Override
 	public void delete(int id) {
 		projectDao.delete(id);
+		List<ProjectMemo> list = projectMemoService.queryByProjectId(id);
+		if(!CollectionUtils.isEmpty(list)) {
+			for(ProjectMemo pm : list) {
+				projectMemoService.delete(pm.getId());
+			}
+		}
 	}
 
 	@Override

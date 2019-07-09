@@ -48,7 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/role/delete").hasRole(RoleConfig.ROLE_DELETE)
 		
 		//项目信息
-		.antMatchers("/project/*").hasAnyRole(RoleConfig.USER_QUERY)
+		.antMatchers("/project/*","/projectMemo/*").hasAnyRole(RoleConfig.USER_QUERY)
 		
 		
 		.and().headers().frameOptions().disable()
