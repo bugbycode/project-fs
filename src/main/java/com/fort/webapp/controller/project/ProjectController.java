@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +27,7 @@ public class ProjectController {
 	private ProjectService projectService;
 
 	@RequestMapping(value = "/query",method = {RequestMethod.GET})
-	public String query() {
+	public String query(@ModelAttribute("p")Project pro) {
 		return "pages/project/manager";
 	}
 	
@@ -51,12 +52,39 @@ public class ProjectController {
 	
 	@RequestMapping(value = "/delete",method = {RequestMethod.POST})
 	public String delete(@RequestParam(name = "id",defaultValue="0") int id) {
-		projectService.delete(id);
+		if(id > 0) {
+			Project pro = projectService.queryById(id);
+			if(!(pro == null || pro.getType() == 0)) {
+				List<Project> list = projectService.queryByParentId(pro.getId());
+				if(CollectionUtils.isEmpty(list)) {
+					projectService.delete(id);
+				}
+			}
+		}
 		return "redirect:/project/query";
 	}
 	
 	@RequestMapping(value = "/queryById",method = {RequestMethod.GET})
 	public Project queryById(@RequestParam(name = "id",defaultValue="0") int id) {
 		return projectService.queryById(id);
+	}
+	
+	@RequestMapping(value = "/checkDel",method = {RequestMethod.GET})
+	@ResponseBody
+	public Map<String,Object> checkDel(@RequestParam(name = "id",defaultValue="0") int id){
+		Map<String,Object> result = new HashMap<String,Object>();
+		int code = 0;
+		if(id == 0) {
+			code = 1;
+		}
+		Project pro = projectService.queryById(id);
+		if(pro != null) {
+			List<Project> list = projectService.queryByParentId(pro.getId());
+			if(!CollectionUtils.isEmpty(list)) {
+				code = 2;
+			}
+		}
+		result.put("code", code);
+		return result;
 	}
 }

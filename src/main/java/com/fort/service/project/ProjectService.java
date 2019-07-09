@@ -10,6 +10,8 @@ public interface ProjectService {
 	
 	public Project queryById(int id);
 	
+	public List<Project> queryByParentId(int parentId);
+	
 	public int insert(Project pro);
 	
 	public void update(Project pro);

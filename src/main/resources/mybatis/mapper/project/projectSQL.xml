@@ -24,6 +24,19 @@
 		]]>
 	</select>
 	
+	<select id="queryByParentId" parameterType="int" resultMap="projectResult">
+		<![CDATA[
+			SELECT
+			  `id`,
+			  `name`,
+			  `type`,
+			  `parent_id`,
+			  `create_time`,
+			  `update_time`
+			FROM `project` WHERE `parent_id` = #{parentId}
+		]]>
+	</select>
+	
 	<select id="queryById" parameterType="int" resultMap="projectResult">
 		<![CDATA[
 			SELECT

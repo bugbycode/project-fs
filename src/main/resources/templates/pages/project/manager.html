@@ -29,6 +29,13 @@
 	
 	<link th:href="@{/assets/plugins/jstree/dist/themes/default/style.min.css}" rel="stylesheet" />
 	
+	
+	<link th:href="@{/assets/plugins/gritter/css/jquery.gritter.css}" rel="stylesheet" />
+	
+	<!-- ================== BEGIN PAGE LEVEL STYLE ================== -->
+	<link th:href="@{/assets/plugins/parsley/src/parsley.css}" rel="stylesheet" />
+	<!-- ================== END PAGE LEVEL STYLE ================== -->
+	
 	<!-- ================== BEGIN BASE JS ================== -->
 	<script th:src="@{/assets/plugins/pace/pace.min.js}"></script>
 	<script th:src="@{/assets/plugins/jquery/jquery-3.3.1.min.js}"></script>
@@ -79,7 +86,7 @@
 							</div>
 							<h4 class="panel-title">项目信息</h4>
 						</div>
-						<div class="panel panel-body">
+						<div class="panel panel-body overflow-auto">
 							<div class="projectTree"></div>
 						</div>
 					</div>
@@ -119,14 +126,15 @@
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
 				</div>
 				<div class="modal-body">
-					<form action="" method="post" autocomplete="off">
+					<form id="addForm" th:action="@{/project/insert}" data-parsley-validate="true" th:object="${p}" method="post" autocomplete="off">
 						<div class="form-group row m-b-15">
 							<label class="col-form-label col-md-3">项目名称 <span class="text-danger">*</span></label>
 							<div class="col-md-9">
+								<input type="hidden" name="id" value="0"/>
+								<input type="hidden" name="parentId" value="0"/>
 								<input type="text" name="name" th:value="*{name}" class="form-control m-b-5" 
 									placeholder="请输入项目名称"  data-parsley-required="true" data-parsley-required-message="请输入项目名称" 
-									data-parsley-length="[2,20]" data-parsley-length-message="姓名长度不能少于两个字符且不能超过二十个字符"
-									data-parsley-pattern="^[A-Za-z0-9\u4e00-\u9fa5]*" data-parsley-pattern-message="姓名不能包含英文特殊字符"
+									data-parsley-length="[2,20]" data-parsley-length-message="项目名称长度不能少于两个字符且不能超过二十个字符"
 									/>
 							</div>
 						</div>
@@ -134,12 +142,14 @@
 				</div>
 				<div class="modal-footer">
 					<a href="javascript:;" class="btn btn-white" data-dismiss="modal">关闭</a>
-					<a href="javascript:;" class="btn btn-success">提交</a>
+					<a href="javascript:;" class="btn btn-primary addForm">提交</a>
 				</div>
 			</div>
 		</div>
 	</div>
-	
+	<form id="delForm" th:action="@{/project/delete}" method="post">
+		<input type="hidden" name="id" value=""/>
+	</form>
 	<!-- ================== BEGIN BASE JS ================== -->
 	<script th:src="@{/assets/plugins/jquery-ui/jquery-ui.min.js}"></script>
 	<script th:src="@{/assets/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
@@ -154,8 +164,16 @@
 	<script th:src="@{/assets/js/apps.min.js}"></script>
 	<!-- ================== END BASE JS ================== -->
 	<script th:src="@{/assets/plugins/jstree/dist/jstree.min.js}"></script>
+	<script th:src="@{/assets/plugins/parsley/dist/parsley.js}"></script>
+	
+	<!-- 模态框  BEGIN-->
+	<script th:src="@{/assets/plugins/gritter/js/jquery.gritter.js}"></script>
+	<script th:src="@{/assets/plugins/bootstrap-sweetalert/sweetalert.min.js}"></script>
+	<!-- 模态框  END-->
+	
 	<script type="text/javascript">
 		var rootPath = [[@{/}]];
+		var idReg = /^[0-9]*$/;
 		$(".projectTree").jstree({
 			"core": {
 				"themes": {
@@ -208,6 +226,16 @@
 				    	 "action": function(data){
 				    		 var inst = jQuery.jstree.reference(data.reference);
 				    	     var obj = inst.get_node(data.reference);
+				    	     var id = obj.id;
+				    	     if(!idReg.test(id)){
+				    	    	 id = 0;
+				    	     }
+				    	     $("#addForm").attr("action",rootPath + 'project/insert');
+				    	     $("#addForm").find("input[name='name']").val("");
+				    	     $("#addForm").find("input[name='name']").removeClass("parsley-error");
+				    	     $("#addForm").find(".parsley-errors-list").removeClass("filled");
+				    	     $("#addForm").find("input[name='parentId']").val(id);
+				    	     $("#project-add-modal-dialog").find(".modal-title").text("添加项目");
 				    	     $("#project-add-modal-dialog").modal("show");
 				    	 }
 				     },"rename":{
@@ -215,23 +243,151 @@
 				    	 "action": function(data){
 				    		 var inst = jQuery.jstree.reference(data.reference);
 				    	     var obj = inst.get_node(data.reference);
+				    	     var id = obj.id;
+				    	     if(!idReg.test(id)){
+				    	    	 id = 0;
+				    	     }
+				    	     if(id == 0){
+				    	    	window.event.preventDefault();
+				 				swal({
+				 					title: '不允许修改内置节点！',
+				 					text: '',
+				 					icon: 'warning',
+				 					buttons: {
+				 						confirm: {
+				 							text: '确定',
+				 							value: true,
+				 							visible: true,
+				 							className: 'btn btn-warning',
+				 							closeModal: true
+				 						}
+				 					}
+				 				})
+				    	     }else{
+				    	    	 $("#addForm").attr("action",rootPath + 'project/update');
+					    	     $("#addForm").find("input[name='name']").removeClass("parsley-error");
+					    	     $("#addForm").find(".parsley-errors-list").removeClass("filled");
+					    	     $("#addForm").find("input[name='name']").val(obj.text);
+					    	     $("#addForm").find("input[name='id']").val(id);
+					    	     $("#project-add-modal-dialog").find(".modal-title").text("修改名称");
+					    	     $("#project-add-modal-dialog").modal("show");
+				    	     }
 				    	 }
 				     },"delete":{
 				    	 "label": "删除项目",
 						 "action": function(data){
 							 var inst = $.jstree.reference(data.reference),
 								obj = inst.get_node(data.reference);
-							 if(inst.is_selected(obj)) {
-								inst.delete_node(inst.get_selected());
-							 } else {
-								inst.delete_node(obj);
-							 }
+							 var id = obj.id;
+				    	     if(!idReg.test(id)){
+				    	    	 id = 0;
+				    	     }
+				    	     if(id == 0){
+				    	    	window.event.preventDefault();
+				 				swal({
+				 					title: '不允许删除内置节点！',
+				 					text: '',
+				 					icon: 'warning',
+				 					buttons: {
+				 						confirm: {
+				 							text: '确定',
+				 							value: true,
+				 							visible: true,
+				 							className: 'btn btn-warning',
+				 							closeModal: true
+				 						}
+				 					}
+				 				})
+				    	     }else{
+				    	    	 $.ajax({
+				    	    		 url:rootPath + 'project/checkDel',
+				    	    		 data:'id=' + id,
+				    	    		 dataType:"json",
+				    	    		 cache:false,
+				    	    		 success:function(result){
+				    	    			 var code = result.code;
+				    	    			 if(code == 2){
+				    	    				window.event.preventDefault();
+							 				swal({
+							 					title: '请先删除子项目',
+							 					text: '',
+							 					icon: 'warning',
+							 					buttons: {
+							 						confirm: {
+							 							text: '确定',
+							 							value: true,
+							 							visible: true,
+							 							className: 'btn btn-warning',
+							 							closeModal: true
+							 						}
+							 					}
+							 				})
+				    	    			 }else{
+				    	    				 window.event.preventDefault();
+			    	    					 swal({
+			    	    						title: '您确定删除该项目吗？',
+			    	    						text: '您执行该操作后项目信息会被永久删除，是否继续？',
+			    	    						icon: 'warning',
+			    	    						buttons: {
+			    	    							cancel: {
+			    	    								text: '取消',
+			    	    								value: false,
+			    	    								visible: true,
+			    	    								className: 'btn btn-default',
+			    	    								closeModal: true,
+			    	    							},
+			    	    							confirm: {
+			    	    								text: '确定',
+			    	    								value: true,
+			    	    								visible: true,
+			    	    								className: 'btn btn-warning',
+			    	    								closeModal: true
+			    	    							}
+			    	    						}
+			    	    					 }).then(function(value){
+			    	    						if(value == true){
+			    	    							$("#delForm").find("input[name='id']").val(id);
+									    	    	 $("#delForm").submit();
+			    	    						}
+			    	    					 });
+				    	    			 }
+				    	    		 }
+				    	    	 });
+				    	    	 /*if(inst.is_selected(obj)) {
+									inst.delete_node(inst.get_selected());
+								 } else {
+									inst.delete_node(obj);
+								 }*/
+				    	     }
 				    	 }
 				     }
 				}
 			}
 		});
 		
+		$(".addForm").click(function(e){
+			var action = $("#addForm").attr("action");
+			var id = $("#addForm").find("input[name='id']").val();
+			if(action.indexOf("/update") != -1 && id == 0){
+				e.preventDefault();
+				swal({
+					title: '不允许修改内置节点！',
+					text: '',
+					icon: 'warning',
+					buttons: {
+						confirm: {
+							text: '确定',
+							value: true,
+							visible: true,
+							className: 'btn btn-warning',
+							closeModal: true
+						}
+					}
+				})
+			}else{
+				$("#addForm").submit();
+			}
+		});
 	</script>
 </body>
 </html>

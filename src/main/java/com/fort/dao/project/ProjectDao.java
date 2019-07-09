@@ -15,4 +15,6 @@ public interface ProjectDao {
 	public void update(Project pro);
 	
 	public void delete(int id);
+
+	public List<Project> queryByParentId(int parentId);
 }

@@ -47,6 +47,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/role/update").hasRole(RoleConfig.ROLE_UPDATE)
 		.antMatchers("/role/delete").hasRole(RoleConfig.ROLE_DELETE)
 		
+		//项目信息
+		.antMatchers("/project/*").hasAnyRole(RoleConfig.USER_QUERY)
+		
+		
 		.and().headers().frameOptions().disable()
 		
 		//用户登录页面 所有人均可访问

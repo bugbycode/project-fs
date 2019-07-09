@@ -36,4 +36,9 @@ public class ProjectDaoImpl extends BaseDao implements ProjectDao {
 		getSqlSession().delete("project.delete", id);
 	}
 
+	@Override
+	public List<Project> queryByParentId(int parentId) {
+		return getSqlSession().selectList("project.queryByParentId", parentId);
+	}
+
 }
