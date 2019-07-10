@@ -147,7 +147,7 @@
 							</div>
 						</div>
 						<!-- 操作记录 -->
-						<div class="panel-inverse">
+						<div class="panel-inverse" style="display: none;">
 							<div class="panel-heading">
 								<div class="panel-heading-btn">
 									
@@ -275,7 +275,9 @@
 											<input type="checkbox" value="" id="checkAllProjectRole" 
 												th:checked="*{#lists.contains(grantSet,'PROJECT_QUERY') && #lists.contains(grantSet,'PROJECT_INSERT') 
 														&& #lists.contains(grantSet,'PROJECT_UPDATE')
-													  && #lists.contains(grantSet,'PROJECT_DELETE')}"
+													  && #lists.contains(grantSet,'PROJECT_DELETE') && #lists.contains(grantSet,'PROJECT_FILE_QUERY')
+													   && #lists.contains(grantSet,'PROJECT_FILE_DELETE')  && #lists.contains(grantSet,'PROJECT_FILE_UPLOAD')
+													    && #lists.contains(grantSet,'PROJECT_FILE_DOWNLOAD')}"
 												 />
 											<label th:for="*{type eq 1 ? 'checkAllProjectRole' : ''}">项目信息</label>
 										</div>
@@ -294,46 +296,31 @@
 										<div class="row checkboxRowHeight">
 											<div class="checkbox checkbox-css checkbox-inline">
 												<input name="grantedAuthority" type="checkbox" value="PROJECT_UPDATE" id="projectUpdate" th:checked="*{#lists.contains(grantSet,'PROJECT_UPDATE')}"/>
-												<label  th:for="*{type eq 1 ? 'projectUpdate' : ''}">修改项目</label>
+												<label  th:for="*{type eq 1 ? 'projectUpdate' : ''}">修改名称</label>
 											</div>
 											<div class="checkbox checkbox-css checkbox-inline">
 												<input name="grantedAuthority" type="checkbox" value="PROJECT_DELETE" id="projectDelete" th:checked="*{#lists.contains(grantSet,'PROJECT_DELETE')}"/>
 												<label  th:for="*{type eq 1 ? 'projectDelete' : ''}">删除项目</label>
 											</div>
 										</div>
-									</div>
-								</div>
-								<div class="checkboxSplitLine"></div>
-								<div class="form-group row m-b-10">
-									<div class="col-md-5">
-										<div class="checkbox checkbox-css">
-											<input type="checkbox" value="" id="checkAllUpgradRole" 
-												th:checked="*{#lists.contains(grantSet,'UPGRAD_QUERY') && #lists.contains(grantSet,'UPGRAD_INSERT') 
-														&& #lists.contains(grantSet,'UPGRAD_UPDATE')
-													  && #lists.contains(grantSet,'UPGRAD_DELETE')}"
-												 />
-											<label th:for="*{type eq 1 ? 'checkAllUpgradRole' : ''}">技术支持</label>
-										</div>
-									</div>
-									<div class="col-md-7">
 										<div class="row checkboxRowHeight">
 											<div class="checkbox checkbox-css checkbox-inline">
-												<input name="grantedAuthority" type="checkbox" value="UPGRAD_QUERY" id="upgradQuery" th:checked="*{#lists.contains(grantSet,'UPGRAD_QUERY')}" />
-												<label  th:for="*{type eq 1 ? 'upgradQuery' : ''}">查看记录</label>
+												<input name="grantedAuthority" type="checkbox" value="PROJECT_FILE_QUERY" id="projectFileQuery" th:checked="*{#lists.contains(grantSet,'PROJECT_FILE_QUERY')}"/>
+												<label  th:for="*{type eq 1 ? 'projectFileQuery' : ''}">查看文档</label>
 											</div>
 											<div class="checkbox checkbox-css checkbox-inline">
-												<input name="grantedAuthority" type="checkbox" value="UPGRAD_INSERT" id="upgradInsert" th:checked="*{#lists.contains(grantSet,'UPGRAD_INSERT')}"/>
-												<label  th:for="*{type eq 1 ? 'upgradInsert' : ''}">添加记录</label>
+												<input name="grantedAuthority" type="checkbox" value="PROJECT_FILE_DELETE" id="projectFileDelete" th:checked="*{#lists.contains(grantSet,'PROJECT_FILE_DELETE')}"/>
+												<label  th:for="*{type eq 1 ? 'projectFileDelete' : ''}">删除文档</label>
 											</div>
 										</div>
 										<div class="row checkboxRowHeight">
 											<div class="checkbox checkbox-css checkbox-inline">
-												<input name="grantedAuthority" type="checkbox" value="UPGRAD_UPDATE" id="upgradUpdate" th:checked="*{#lists.contains(grantSet,'UPGRAD_UPDATE')}"/>
-												<label  th:for="*{type eq 1 ? 'upgradUpdate' : ''}">修改记录</label>
+												<input name="grantedAuthority" type="checkbox" value="PROJECT_FILE_UPLOAD" id="projectFileUpload" th:checked="*{#lists.contains(grantSet,'PROJECT_FILE_UPLOAD')}"/>
+												<label  th:for="*{type eq 1 ? 'projectFileUpload' : ''}">上传文档</label>
 											</div>
 											<div class="checkbox checkbox-css checkbox-inline">
-												<input name="grantedAuthority" type="checkbox" value="UPGRAD_DELETE" id="upgradDelete" th:checked="*{#lists.contains(grantSet,'UPGRAD_DELETE')}"/>
-												<label  th:for="*{type eq 1 ? 'upgradDelete' : ''}">删除记录</label>
+												<input name="grantedAuthority" type="checkbox" value="PROJECT_FILE_DOWNLOAD" id="projectFileDownload" th:checked="*{#lists.contains(grantSet,'PROJECT_FILE_DOWNLOAD')}"/>
+												<label  th:for="*{type eq 1 ? 'projectFileDownload' : ''}">下载文档</label>
 											</div>
 										</div>
 									</div>
@@ -439,6 +426,11 @@
 				$("#projectInsert").prop("checked",checked);
 				$("#projectUpdate").prop("checked",checked);
 				$("#projectDelete").prop("checked",checked);
+				
+				$("#projectFileQuery").prop("checked",checked);
+				$("#projectFileUpload").prop("checked",checked);
+				$("#projectFileDownload").prop("checked",checked);
+				$("#projectFileDelete").prop("checked",checked);
 			});
 			
 			$("#checkAllUpgradRole").click(function(){

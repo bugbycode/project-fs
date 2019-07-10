@@ -266,28 +266,19 @@
 	<script th:src="@{/assets/plugins/bootstrap-sweetalert/sweetalert.min.js}"></script>
 	<!-- 模态框  END-->
 	
-	<script type="text/javascript">
+	<script type="text/javascript" th:inline="javascript">
+		var authorities = [[${session.SPRING_SECURITY_CONTEXT.authentication.authorities}]];
 		var rootPath = [[@{/}]];
 		var idReg = /^[0-9]*$/;
+		console.log(JSON.stringify(authorities));
 		
-		function downFile(id){
-			location.href= rootPath + 'projectMemo/download?id=' + id;
-		}
-		
-		function deletePm(id){
+		function showMessage(message){
 			window.event.preventDefault();
-			 swal({
-				title: '您确定删除该文档吗？',
-				text: '您执行该操作后文档信息会被永久删除，是否继续？',
+			swal({
+				title: message,
+				text: '',
 				icon: 'warning',
 				buttons: {
-					cancel: {
-						text: '取消',
-						value: false,
-						visible: true,
-						className: 'btn btn-default',
-						closeModal: true,
-					},
 					confirm: {
 						text: '确定',
 						value: true,
@@ -296,31 +287,81 @@
 						closeModal: true
 					}
 				}
-			 }).then(function(value){
-				if(value == true){
-					$("#deletePmForm").find("input[name='id']").val(id);
-					$("#deletePmForm").submit();
+			})
+		}
+		
+		function checkRole(role){
+			for(var index = 0;index < authorities.length;index++){
+				if(role == authorities[index].authority){
+					return true;
 				}
-			 });
+			}
+			return false;
+		}
+		
+		function downFile(id){
+			if(checkRole('ROLE_PROJECT_FILE_DOWNLOAD')){
+				location.href= rootPath + 'projectMemo/download?id=' + id;
+			}else{
+				showMessage('您无权访问该功能！');
+			}
+		}
+		
+		function deletePm(id){
+			if(checkRole('ROLE_PROJECT_FILE_DELETE')){
+				window.event.preventDefault();
+				 swal({
+					title: '您确定删除该文档吗？',
+					text: '您执行该操作后文档信息会被永久删除，是否继续？',
+					icon: 'warning',
+					buttons: {
+						cancel: {
+							text: '取消',
+							value: false,
+							visible: true,
+							className: 'btn btn-default',
+							closeModal: true,
+						},
+						confirm: {
+							text: '确定',
+							value: true,
+							visible: true,
+							className: 'btn btn-warning',
+							closeModal: true
+						}
+					}
+				 }).then(function(value){
+					if(value == true){
+						$("#deletePmForm").find("input[name='id']").val(id);
+						$("#deletePmForm").submit();
+					}
+				 });
+			}else{
+				showMessage('您无权访问该功能！');
+			}
 		}
 		
 		function showInfo(id){
-			$.ajax({
-				url:rootPath + 'projectMemo/queryById',
-				type:'get',
-				data:"id=" + id,
-				dataType:'json',
-				cache:false,
-				success:function(result){
-					console.log(JSON.stringify(result));
-					if(result){
-						$("#project-info-modal-dialog").modal("show");
-						$("#project-info-modal-dialog").find("input[id='fileName']").val(result.fileName);
-						$("#project-info-modal-dialog").find("input[id='md5Sign']").val(result.md5Sign);
-						$("#project-info-modal-dialog").find("textarea[id='description']").text(result.description);
+			if(checkRole('ROLE_PROJECT_FILE_DOWNLOAD')){
+				$.ajax({
+					url:rootPath + 'projectMemo/queryById',
+					type:'get',
+					data:"id=" + id,
+					dataType:'json',
+					cache:false,
+					success:function(result){
+						console.log(JSON.stringify(result));
+						if(result){
+							$("#project-info-modal-dialog").modal("show");
+							$("#project-info-modal-dialog").find("input[id='fileName']").val(result.fileName);
+							$("#project-info-modal-dialog").find("input[id='md5Sign']").val(result.md5Sign);
+							$("#project-info-modal-dialog").find("textarea[id='description']").text(result.description);
+						}
 					}
-				}
-			});
+				});
+			}else{
+				showMessage('您无权访问该功能！');
+			}
 		}
 		
 		function showFileList(id){
@@ -351,27 +392,20 @@
 		    		});
 		    		$("#data-table-default-file").find("tbody").append(htmlStr);
 		    		//console.log(JSON.stringify(result));
-		    	}
+		    	},error: function (XMLHttpRequest, textStatus, errorThrown) {
+		    		$("#data-table-default-file").find("tbody").find("tr").eq(0).show();
+		    		$("#data-table-default-file").find("tbody").find("tr").eq(0).nextAll().remove();
+                    /*
+		    		// 状态码
+                    console.log(XMLHttpRequest.status);
+                    // 状态
+                    console.log(XMLHttpRequest.readyState);
+                    // 错误信息   
+                    console.log(textStatus);*/
+                }
 		    });
 		}
 		
-		function showMessage(message){
-			window.event.preventDefault();
-			swal({
-				title: message,
-				text: '',
-				icon: 'warning',
-				buttons: {
-					confirm: {
-						text: '确定',
-						value: true,
-						visible: true,
-						className: 'btn btn-warning',
-						closeModal: true
-					}
-				}
-			})
-		}
 		
 		$(".projectTree").jstree({
 			"core": {
@@ -423,111 +457,127 @@
 				    "create":{
 				    	 "label": "添加项目",
 				    	 "action": function(data){
-				    		 var inst = jQuery.jstree.reference(data.reference);
-				    	     var obj = inst.get_node(data.reference);
-				    	     var id = obj.id;
-				    	     if(!idReg.test(id)){
-				    	    	 id = 0;
-				    	     }
-				    	     $("#addForm").attr("action",rootPath + 'project/insert');
-				    	     $("#addForm").find("input[name='name']").val("");
-				    	     $("#addForm").find("input[name='name']").removeClass("parsley-error");
-				    	     $("#addForm").find(".parsley-errors-list").removeClass("filled");
-				    	     $("#addForm").find("input[name='parentId']").val(id);
-				    	     $("#project-add-modal-dialog").find(".modal-title").text("添加项目");
-				    	     $("#project-add-modal-dialog").modal("show");
+				    		 if(checkRole('ROLE_PROJECT_INSERT')){
+				    			 var inst = jQuery.jstree.reference(data.reference);
+					    	     var obj = inst.get_node(data.reference);
+					    	     var id = obj.id;
+					    	     if(!idReg.test(id)){
+					    	    	 id = 0;
+					    	     }
+					    	     $("#addForm").attr("action",rootPath + 'project/insert');
+					    	     $("#addForm").find("input[name='name']").val("");
+					    	     $("#addForm").find("input[name='name']").removeClass("parsley-error");
+					    	     $("#addForm").find(".parsley-errors-list").removeClass("filled");
+					    	     $("#addForm").find("input[name='parentId']").val(id);
+					    	     $("#project-add-modal-dialog").find(".modal-title").text("添加项目");
+					    	     $("#project-add-modal-dialog").modal("show");
+				    		 }else{
+				    			 showMessage('您无权访问该功能！');
+				    		 }
 				    	 }
 				     },"rename":{
 				    	 "label": "修改名称",
 				    	 "action": function(data){
-				    		 var inst = jQuery.jstree.reference(data.reference);
-				    	     var obj = inst.get_node(data.reference);
-				    	     var id = obj.id;
-				    	     if(!idReg.test(id)){
-				    	    	 id = 0;
-				    	     }
-				    	     if(id == 0){
-				    	    	 showMessage("不允许修改内置节点！");
-				    	     }else{
-				    	    	 $("#addForm").attr("action",rootPath + 'project/update');
-					    	     $("#addForm").find("input[name='name']").removeClass("parsley-error");
-					    	     $("#addForm").find(".parsley-errors-list").removeClass("filled");
-					    	     $("#addForm").find("input[name='name']").val(obj.text);
-					    	     $("#addForm").find("input[name='id']").val(id);
-					    	     $("#project-add-modal-dialog").find(".modal-title").text("修改名称");
-					    	     $("#project-add-modal-dialog").modal("show");
-				    	     }
+				    		 if(checkRole('ROLE_PROJECT_UPDATE')){
+				    			 var inst = jQuery.jstree.reference(data.reference);
+					    	     var obj = inst.get_node(data.reference);
+					    	     var id = obj.id;
+					    	     if(!idReg.test(id)){
+					    	    	 id = 0;
+					    	     }
+					    	     if(id == 0){
+					    	    	 showMessage("不允许修改内置节点！");
+					    	     }else{
+					    	    	 $("#addForm").attr("action",rootPath + 'project/update');
+						    	     $("#addForm").find("input[name='name']").removeClass("parsley-error");
+						    	     $("#addForm").find(".parsley-errors-list").removeClass("filled");
+						    	     $("#addForm").find("input[name='name']").val(obj.text);
+						    	     $("#addForm").find("input[name='id']").val(id);
+						    	     $("#project-add-modal-dialog").find(".modal-title").text("修改名称");
+						    	     $("#project-add-modal-dialog").modal("show");
+					    	     }
+				    		 }else{
+				    			 showMessage('您无权访问该功能！');
+				    		 }
 				    	 }
 				     },"delete":{
 				    	 "label": "删除项目",
 						 "action": function(data){
-							 var inst = $.jstree.reference(data.reference),
-								obj = inst.get_node(data.reference);
-							 var id = obj.id;
-				    	     if(!idReg.test(id)){
-				    	    	 id = 0;
-				    	     }
-				    	     if(id == 0){
-				    	    	 showMessage("不允许删除内置节点！");
-				    	     }else{
-				    	    	 $.ajax({
-				    	    		 url:rootPath + 'project/checkDel',
-				    	    		 data:'id=' + id,
-				    	    		 dataType:"json",
-				    	    		 cache:false,
-				    	    		 success:function(result){
-				    	    			 var code = result.code;
-				    	    			 if(code == 2){
-				    	    				 showMessage("请先删除子项目！");
-				    	    			 }else{
-				    	    				 window.event.preventDefault();
-			    	    					 swal({
-			    	    						title: '您确定删除该项目吗？',
-			    	    						text: '您执行该操作后项目信息会被永久删除，是否继续？',
-			    	    						icon: 'warning',
-			    	    						buttons: {
-			    	    							cancel: {
-			    	    								text: '取消',
-			    	    								value: false,
-			    	    								visible: true,
-			    	    								className: 'btn btn-default',
-			    	    								closeModal: true,
-			    	    							},
-			    	    							confirm: {
-			    	    								text: '确定',
-			    	    								value: true,
-			    	    								visible: true,
-			    	    								className: 'btn btn-warning',
-			    	    								closeModal: true
-			    	    							}
-			    	    						}
-			    	    					 }).then(function(value){
-			    	    						if(value == true){
-			    	    							$("#delForm").find("input[name='id']").val(id);
-									    	    	 $("#delForm").submit();
-			    	    						}
-			    	    					 });
-				    	    			 }
-				    	    		 }
-				    	    	 });
-				    	    	 /*if(inst.is_selected(obj)) {
-									inst.delete_node(inst.get_selected());
-								 } else {
-									inst.delete_node(obj);
-								 }*/
-				    	     }
+							 if(checkRole('ROLE_PROJECT_DELETE')){
+								 var inst = $.jstree.reference(data.reference),
+									obj = inst.get_node(data.reference);
+								 var id = obj.id;
+					    	     if(!idReg.test(id)){
+					    	    	 id = 0;
+					    	     }
+					    	     if(id == 0){
+					    	    	 showMessage("不允许删除内置节点！");
+					    	     }else{
+					    	    	 $.ajax({
+					    	    		 url:rootPath + 'project/checkDel',
+					    	    		 data:'id=' + id,
+					    	    		 dataType:"json",
+					    	    		 cache:false,
+					    	    		 success:function(result){
+					    	    			 var code = result.code;
+					    	    			 if(code == 2){
+					    	    				 showMessage("请先删除子项目！");
+					    	    			 }else{
+					    	    				 window.event.preventDefault();
+				    	    					 swal({
+				    	    						title: '您确定删除该项目吗？',
+				    	    						text: '您执行该操作后项目信息会被永久删除，是否继续？',
+				    	    						icon: 'warning',
+				    	    						buttons: {
+				    	    							cancel: {
+				    	    								text: '取消',
+				    	    								value: false,
+				    	    								visible: true,
+				    	    								className: 'btn btn-default',
+				    	    								closeModal: true,
+				    	    							},
+				    	    							confirm: {
+				    	    								text: '确定',
+				    	    								value: true,
+				    	    								visible: true,
+				    	    								className: 'btn btn-warning',
+				    	    								closeModal: true
+				    	    							}
+				    	    						}
+				    	    					 }).then(function(value){
+				    	    						if(value == true){
+				    	    							$("#delForm").find("input[name='id']").val(id);
+										    	    	 $("#delForm").submit();
+				    	    						}
+				    	    					 });
+					    	    			 }
+					    	    		 }
+					    	    	 });
+					    	    	 /*if(inst.is_selected(obj)) {
+										inst.delete_node(inst.get_selected());
+									 } else {
+										inst.delete_node(obj);
+									 }*/
+					    	     }
+							 }else{
+								 showMessage('您无权访问该功能！');
+							 }
 				    	 }
 				     },"upFile":{
 				    	 "label":"上传文件",
 				    	 "action":function(data){
-				    		 var inst = $.jstree.reference(data.reference),
-								obj = inst.get_node(data.reference);
-							 var id = obj.id;
-				    	     if(!idReg.test(id)){
-				    	    	 id = 0;
-				    	     }
-				    		 $("#addFileForm").find("input[name='projectId']").val(id);
-				    		 $("#project-file-up-modal-dialog").modal("show");
+				    		 if(checkRole('PROJECT_FILE_UPLOAD')){
+				    			 var inst = $.jstree.reference(data.reference),
+									obj = inst.get_node(data.reference);
+								 var id = obj.id;
+					    	     if(!idReg.test(id)){
+					    	    	 id = 0;
+					    	     }
+					    		 $("#addFileForm").find("input[name='projectId']").val(id);
+					    		 $("#project-file-up-modal-dialog").modal("show");
+				    		 }else{
+								 showMessage('您无权访问该功能！');
+							 }
 				    	 }
 				     }
 				}

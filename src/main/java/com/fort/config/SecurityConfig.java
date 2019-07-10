@@ -48,8 +48,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/role/delete").hasRole(RoleConfig.ROLE_DELETE)
 		
 		//项目信息
-		.antMatchers("/project/*","/projectMemo/*").hasAnyRole(RoleConfig.USER_QUERY)
+		//查看项目权限
+		.antMatchers("/project/query","/project/projectTree","/project/queryById","/project/checkDel")
+			.hasAnyRole(RoleConfig.PROJECT_QUERY,RoleConfig.PROJECT_INSERT,
+				RoleConfig.PROJECT_UPDATE,RoleConfig.PROJECT_DELETE,RoleConfig.PROJECT_FILE_QUERY
+				,RoleConfig.PROJECT_FILE_DELETE,RoleConfig.PROJECT_FILE_UPLOAD,RoleConfig.PROJECT_FILE_DOWNLOAD)
 		
+		//添加项目
+		.antMatchers("/project/insert").hasRole(RoleConfig.PROJECT_INSERT)	
+		//修改名称
+		.antMatchers("/project/update").hasRole(RoleConfig.PROJECT_UPDATE)
+		//删除项目
+		.antMatchers("/project/delete").hasRole(RoleConfig.PROJECT_DELETE)
+		
+		//文档管理
+		//显示文档列表
+		.antMatchers("/projectMemo/queryByProjectId").hasRole(RoleConfig.PROJECT_FILE_QUERY)
+		//上传文档
+		.antMatchers("/projectMemo/upFile").hasRole(RoleConfig.PROJECT_FILE_UPLOAD)
+		//下载文档
+		.antMatchers("/projectMemo/download","/projectMemo/queryById").hasRole(RoleConfig.PROJECT_FILE_DOWNLOAD)
+		//删除文档
+		.antMatchers("/projectMemo/delete").hasRole(RoleConfig.PROJECT_FILE_DELETE)
 		
 		.and().headers().frameOptions().disable()
 		
