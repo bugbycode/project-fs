@@ -33,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers("/imgCode").permitAll()
 		
 		.antMatchers("/employee/query","/employee/edit","/employee/checkUserName",
-				"/employee/queryRole")
+				"/employee/queryRole","/employee/projectTree")
 		.hasAnyRole(RoleConfig.USER_QUERY,
 				RoleConfig.USER_INSERT,RoleConfig.USER_UPDATE,RoleConfig.USER_DELETE) //主界面所有登录用户均可访问
 		.antMatchers("/employee/insert").hasRole(RoleConfig.USER_INSERT)

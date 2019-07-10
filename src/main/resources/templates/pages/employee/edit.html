@@ -50,6 +50,7 @@
 	<link th:href="@{/assets/plugins/jquery-simplecolorpicker/jquery.simplecolorpicker.css}" rel="stylesheet" />
 	<link th:href="@{/assets/plugins/jquery-simplecolorpicker/jquery.simplecolorpicker-fontawesome.css}" rel="stylesheet" />
 	<link th:href="@{/assets/plugins/jquery-simplecolorpicker/jquery.simplecolorpicker-glyphicons.css}" rel="stylesheet" />
+	<link th:href="@{/assets/plugins/jstree/dist/themes/default/style.min.css}" rel="stylesheet" />
 	<!-- ================== END PAGE LEVEL STYLE ================== -->
 	
 	<!-- ================== BEGIN BASE JS ================== -->
@@ -81,6 +82,7 @@
 		<div id="content" class="content">
 			<form id="empForm" data-parsley-validate="true" th:object="${emp}" method="post" th:action="@{/} + *{id eq 0 ? 'employee/insert' : 'employee/update'}" autocomplete="off">
 				<input type="hidden" th:field="*{id}" />
+				<input type="hidden" name="projectGrant" value=""/>
 				<!-- begin breadcrumb -->
 				<ol class="breadcrumb pull-right">
 					<li class="breadcrumb-item">用户管理</li>
@@ -147,7 +149,7 @@
 								<div class="row form-group m-b-10">
 									<label class="col-md-3 col-form-label"></label>
 									<div class="col-md-9">
-										<button type="submit" class="btn btn-sm btn-primary m-r-5">提交</button>
+										<button type="button" class="btn btn-sm btn-primary m-r-5 subdata">提交</button>
 										<button type="button" class="btn btn-sm btn-default m-r-5" th:onclick="'location.href=\'' + @{/} + 'employee/query\';'">返回</button>
 									</div>
 								</div>
@@ -193,7 +195,18 @@
 									</div>
 								</div>
 							</div>
-						</div>	
+						</div>
+						<div class="panel-inverse">
+							<div class="panel-heading">
+								<div class="panel-heading-btn">
+									
+								</div>
+								<h4 class="panel-title">项目文档授权</h4>
+							</div>
+							<div class="panel panel-body">
+								<div class="jstree-user-checkable"></div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</form>
@@ -205,7 +218,6 @@
 		<!-- end scroll to top btn -->
 	</div>
 	<!-- end page container -->
-	
 	<!-- ================== BEGIN BASE JS ================== -->
 	<script th:src="@{/assets/plugins/jquery-ui/jquery-ui.min.js}"></script>
 	<script th:src="@{/assets/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
@@ -246,9 +258,25 @@
 	<script th:src="@{/assets/plugins/bootstrap-colorpalette/js/bootstrap-colorpalette.js}"></script>
 	<script th:src="@{/assets/plugins/jquery-simplecolorpicker/jquery.simplecolorpicker.js}"></script>
 	<script th:src="@{/assets/plugins/clipboard/clipboard.min.js}"></script>
+	<script th:src="@{/assets/plugins/jstree/dist/jstree.min.js}"></script>
 	<!-- ================== END PAGE LEVEL JS ================== -->
 	<script type="text/javascript" th:inline="javascript">
 		var rootPath = [[@{/}]];
+		
+		$(".subdata").click(function(){
+			var ref = $('.jstree-user-checkable').jstree(true);
+			var projectIdArr = ref.get_selected(false);
+			var idStr = "";
+			for(var index = 0;index < projectIdArr.length;index++){
+				if(index > 0){
+					idStr += ",";
+				}
+				idStr += projectIdArr[index];
+			}
+			$("input[name='projectGrant']").val(idStr);
+			$("#empForm").submit();
+		});
+		
 		function select2Format(selector,url,defaultText){
 			$(selector).select2({
 				width:'100%',
@@ -309,6 +337,39 @@
 				return flag;
 			}
 		});
+		
+		$('.jstree-user-checkable').jstree({
+	        'plugins': ["wholerow", "checkbox", "types"],
+	        'checkbox':{
+	        	"three_state":false
+	        },
+	        'core': {
+	            "themes": {
+	                "responsive": false
+	            },    
+	            'data': function (obj,callback){
+					 $.ajax({
+	                      type: "GET",
+	                      url: rootPath + "employee/projectTree",
+	                      data: "empId=" + [[${emp.id}]],
+	                      dataType:"json",
+	                      async: false,
+	                      cache: false,
+	                      success:function(result) {
+	                    	  callback.call(this, result);
+	                      }
+	                 });
+				}
+	        },
+	        "types": {
+	            "default": {
+	                "icon": "fa fa-folder text-primary fa-lg"
+	            },
+	            "file": {
+	                "icon": "fa fa-file text-success fa-lg"
+	            }
+	        }
+	    });
 		
 	</script>
 </body>

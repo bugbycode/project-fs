@@ -61,6 +61,8 @@ public class Employee implements UserDetails {
 	
 	private String roleName;
 	
+	private String projectGrant;
+	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		Set<GrantedAuthority> authoritie = new HashSet<GrantedAuthority>();
@@ -188,6 +190,14 @@ public class Employee implements UserDetails {
 
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
+	}
+
+	public String getProjectGrant() {
+		return projectGrant;
+	}
+
+	public void setProjectGrant(String projectGrant) {
+		this.projectGrant = projectGrant;
 	}
 
 	public void copy(Employee e) {

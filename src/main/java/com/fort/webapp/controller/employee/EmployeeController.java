@@ -19,11 +19,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fort.module.employee.Employee;
+import com.fort.module.project.Project;
 import com.fort.module.role.Role;
 import com.fort.service.employee.EmployeeService;
+import com.fort.service.project.ProjectService;
 import com.fort.service.role.RoleService;
 import com.util.StringUtil;
 import com.util.page.SearchResult;
+import com.util.tree.ProjectGrantTree;
 
 @Validated
 @Controller
@@ -35,6 +38,9 @@ public class EmployeeController {
 	
 	@Autowired
 	private RoleService roleService;
+	
+	@Autowired
+	private ProjectService projectService;
 
 	@RequestMapping(value = "/query",method = {RequestMethod.GET})
 	public String query(ModelMap model,
@@ -138,5 +144,14 @@ public class EmployeeController {
 		}
 		result.put("empId", empId);
 		return result;
+	}
+	
+	@RequestMapping(value = "/projectTree",method = RequestMethod.GET)
+	@ResponseBody
+	public String projectTree(int empId) {
+		Employee emp = employeeService.queryById(empId);
+		String grant = emp == null ? "" : emp.getProjectGrant();
+		List<Project> list = projectService.query();
+		return new ProjectGrantTree(list,grant).data().toString();
 	}
 }

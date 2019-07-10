@@ -15,6 +15,7 @@
 		<result property="updateTime" 		column="update_time"/>
 		<result property="roleId"			column="role_id"/>
 		<result property="roleName"			column="role_name"/>
+		<result property="projectGrant"		column="project_grant"/>
 	</resultMap>
 	<select id="queryByUserNameAndPassword" parameterType="java.util.HashMap" resultMap="employeeResult">
 		<![CDATA[
@@ -29,7 +30,8 @@
 			  e.`create_time`,
 			  e.`update_time`,
 			  e.`role_id`,
-			  r.`name` AS role_name
+			  r.`name` AS role_name,
+			  e.project_grant AS project_grant
 			FROM `employee` e left join `role` r ON e.role_id = r.id WHERE e.`username` = #{username} AND e.`password` = #{password} LIMIT 1
 		]]>
 	</select>
@@ -46,7 +48,8 @@
 			  e.`create_time`,
 			  e.`update_time`,
 			  e.`role_id`,
-			  r.`name` AS role_name
+			  r.`name` AS role_name,
+			  e.project_grant AS project_grant
 			FROM `employee` e left join `role` r ON e.role_id = r.id 
 		]]>
 		<where>
@@ -99,7 +102,8 @@
 			  e.`create_time`,
 			  e.`update_time`,
 			  e.`role_id`,
-			  r.`name` AS role_name
+			  r.`name` AS role_name,
+			  e.project_grant AS project_grant
 			FROM `employee` e left join `role` r ON e.role_id = r.id WHERE e.`id` = #{empId}
 		]]>
 	</select>
@@ -117,7 +121,8 @@
 			  e.`create_time`,
 			  e.`update_time`,
 			  e.`role_id`,
-			  r.`name` AS role_name
+			  r.`name` AS role_name,
+			  e.project_grant AS project_grant
 			FROM `employee` e left join `role` r ON e.role_id = r.id WHERE e.`username` = #{userName}
 		]]>
 	</select>
@@ -133,7 +138,8 @@
              `type`,
              `status`,
              `create_time`,
-             `role_id`)
+             `role_id`,
+             project_grant)
 			VALUES (
 			        #{name},
 			        #{username},
@@ -142,7 +148,8 @@
 			        #{type},
 			        #{status},
 			        #{createTime},
-			        #{roleId})
+			        #{roleId},
+			        #{projectGrant})
 		]]>
 		<selectKey keyProperty="id" resultType="java.lang.Integer">
 			<![CDATA[
@@ -166,7 +173,8 @@
 			  `email` = #{email},
 			  `status` = #{status},
 			  `update_time` = #{updateTime},
-			  `role_id` = #{roleId}
+			  `role_id` = #{roleId},
+			  project_grant = #{projectGrant}
 			WHERE `id` = #{id}
 		]]>
 	</update>
