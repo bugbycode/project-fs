@@ -63,7 +63,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		
 		//文档管理
 		//显示文档列表
-		.antMatchers("/projectMemo/queryByProjectId").hasRole(RoleConfig.PROJECT_FILE_QUERY)
+		.antMatchers("/projectMemo/queryByProjectId").hasAnyRole(RoleConfig.PROJECT_FILE_QUERY,
+				RoleConfig.PROJECT_FILE_DOWNLOAD,RoleConfig.PROJECT_FILE_UPLOAD,RoleConfig.PROJECT_FILE_DELETE)
 		//上传文档
 		.antMatchers("/projectMemo/upFile").hasRole(RoleConfig.PROJECT_FILE_UPLOAD)
 		//下载文档

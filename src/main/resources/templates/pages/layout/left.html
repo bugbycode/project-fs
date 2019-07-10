@@ -8,31 +8,48 @@
 			<div data-scrollbar="true" data-height="100%">
 				<!-- begin sidebar nav -->
 				<ul class="nav" style="padding-top: 2px;">
-					<li th:class="${page=='employee'} ? 'has-sub active' : 'has-sub'" class="has-sub">
+					<li
+					 th:if="${#strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'USER_QUERY')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'USER_INSERT')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'USER_UPDATE')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'USER_DELETE')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'ROLES_QUERY')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'ROLES_INSERT')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'ROLES_UPDATE')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'ROLES_DELETE')
+					 }"
+					 th:class="${page=='employee'} ? 'has-sub active' : 'has-sub'" class="has-sub">
 						<a href="javascript:;">
 							<b class="caret"></b>
 							<i class="ion-ios-people bg-blue"></i>
 							<span>用户管理</span>
 						</a>
 						<ul class="sub-menu">
-							<li th:class="${menu=='employee' ? 'active' : ''}"><a th:href="@{/employee/query}">用户信息</a></li>
-							<li th:class="${menu=='role' ? 'active' : ''}"><a th:href="@{/role/query}">角色信息</a></li>
+							<li
+							 th:if="${#strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'USER_QUERY')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'USER_INSERT')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'USER_UPDATE')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'USER_DELETE')}"
+							 th:class="${menu=='employee' ? 'active' : ''}"><a th:href="@{/employee/query}">用户信息</a></li>
+							<li
+							 th:if="${#strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'ROLES_QUERY')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'ROLES_INSERT')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'ROLES_UPDATE')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'ROLES_DELETE')}"
+							 th:class="${menu=='role' ? 'active' : ''}"><a th:href="@{/role/query}">角色信息</a></li>
 						</ul>
 					</li>
-					<!-- 
-					<li class="has-sub">
-						<a href="javascript:;">
-							<span class="badge pull-right">10</span>
-							<i class="ion-ios-mail"></i> 
-							<span>Email</span>
-						</a>
-						<ul class="sub-menu">
-							<li><a href="email_inbox.html">Inbox</a></li>
-							<li><a href="email_compose.html">Compose</a></li>
-							<li><a href="email_detail.html">Detail</a></li>
-						</ul>
-					</li> -->
-					<li th:class="${page=='project'} ? 'has-sub active' : 'has-sub'" class="has-sub">
+					<li
+					 th:if="${#strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'PROJECT_QUERY')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'PROJECT_INSERT')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'PROJECT_UPDATE')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'PROJECT_DELETE')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'PROJECT_FILE_QUERY')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'PROJECT_FILE_DELETE')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'PROJECT_FILE_UPLOAD')
+					 || #strings.contains(session.SPRING_SECURITY_CONTEXT.authentication.principal.role.grantedAuthority,'PROJECT_FILE_DOWNLOAD')
+					 }"
+					 th:class="${page=='project'} ? 'has-sub active' : 'has-sub'" class="has-sub">
 						<a href="#">
 							<b class="caret"></b>
 							<i class="ion-ios-apps bg-blue"></i>
