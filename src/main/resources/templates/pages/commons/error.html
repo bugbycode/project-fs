@@ -49,7 +49,7 @@
 					<span th:text="${roncooException}"></span>
                 </div>
                 <div>
-                    <a th:href="@{/employee/query}" class="btn btn-success p-l-20 p-r-20">返回首页</a>&nbsp;
+                    <a th:if="${session.forwardUrl!=null && session.forwardUrl!=''}" th:href="@{/} + ${session.forwardUrl}" class="btn btn-success p-l-20 p-r-20">返回首页</a>&nbsp;
                     <a href="javascript:;" class="btn btn-grey p-l-20 p-r-20 logout">注销登录</a>
                     <form id="logoutForm" th:action="@{/logout}" method="POST">
 						
