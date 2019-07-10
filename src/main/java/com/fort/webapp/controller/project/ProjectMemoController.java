@@ -2,6 +2,7 @@ package com.fort.webapp.controller.project;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,7 +25,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fort.module.employee.Employee;
 import com.fort.module.project.ProjectMemo;
+import com.fort.service.employee.EmployeeService;
 import com.fort.service.project.ProjectMemoService;
 import com.util.MD5Util;
 
@@ -33,6 +37,9 @@ public class ProjectMemoController {
 	
 	@Autowired
 	private ProjectMemoService projectMemoService;
+	
+	@Autowired
+	private EmployeeService employeeService;
 	
 	@Value("${spring.server.projectFilePath}")
 	private String basePath;
@@ -77,9 +84,26 @@ public class ProjectMemoController {
 	@RequestMapping(value = "/queryByProjectId",method = {RequestMethod.GET})
 	@ResponseBody
 	public List<ProjectMemo> queryByProjectId(int projectId){
+		Employee user = (Employee)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int empId = user.getId();
+		Employee emp = employeeService.queryById(empId);
+		String grant = emp.getProjectGrant();
 		Map<String, Object> params = new HashMap<String,Object>();
 		params.put("projectId", projectId);
-		return projectMemoService.query(params);
+		List<ProjectMemo> list = projectMemoService.query(params);
+		List<ProjectMemo> newList = new ArrayList<ProjectMemo>();
+		if(user.getRole().getType() == 1) {
+			for(ProjectMemo pm : list) {
+				String idStr = String.valueOf(pm.getProjectId());
+				if(grant.startsWith(idStr + ",") || grant.endsWith("," + idStr)
+						|| grant.contains("," + idStr + ",") || grant.equals(idStr)) {
+					newList.add(pm);
+				}
+			}
+		}else {
+			newList = list;
+		}
+		return newList;
 	}
 	
 	@RequestMapping(value = "/download",method = {RequestMethod.GET})
