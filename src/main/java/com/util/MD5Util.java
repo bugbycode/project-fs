@@ -1,9 +1,11 @@
 package com.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -91,6 +93,46 @@ public class MD5Util {
 		char c1 = hexDigits[bt & 0xf];
 		stringbuffer.append(c0);
 		stringbuffer.append(c1);
+	}
+	
+	public static String getMd5(String filePath) {
+		String[] command = {"/bin/bash","-c",
+				"md5sum \"" + filePath + "\"|cut -d\" \" -f1"};
+		InputStream in = null;
+		Process pro = null;
+		InputStreamReader isr = null;
+		BufferedReader br = null;
+		StringBuffer buff = new StringBuffer();
+		String line = null;
+		try {
+			pro = Runtime.getRuntime().exec(command);
+			in = pro.getInputStream();
+			isr = new InputStreamReader(in);
+			br = new BufferedReader(isr);
+			while((line = br.readLine()) != null) {
+				buff.append(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if(pro != null) {
+				pro.destroy();
+			}
+			try {
+				if(br != null) {
+					br.close();
+				}
+				if(isr != null) {
+					isr.close();
+				}
+				if(in != null) {
+					in.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return buff.toString();
 	}
 	
 	public static void main(String[] args) throws IOException {

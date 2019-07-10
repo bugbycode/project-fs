@@ -56,9 +56,7 @@ public class ProjectMemoController {
 		
 		String fileName = file.getOriginalFilename();
 		
-		String md5 = MD5Util.getMD5String(file.getBytes());
-		
-		File store = new File(basePath + md5);
+		File store = new File(basePath + new Date().getTime());
 		
 		File parent = store.getParentFile();
 		if(!parent.exists()) {
@@ -68,6 +66,15 @@ public class ProjectMemoController {
 		if(!store.exists()) {
 			store.createNewFile();
 			file.transferTo(store);
+		}
+		
+		String md5 = MD5Util.getMd5(store.getAbsolutePath());
+		
+		File newFile = new File(basePath + md5);
+		if(newFile.exists()) {
+			store.delete();
+		}else {
+			store.renameTo(newFile);
 		}
 		
 		ProjectMemo pm = new ProjectMemo();
