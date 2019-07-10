@@ -566,7 +566,7 @@
 				     },"upFile":{
 				    	 "label":"上传文件",
 				    	 "action":function(data){
-				    		 if(checkRole('PROJECT_FILE_UPLOAD')){
+				    		 if(checkRole('ROLE_PROJECT_FILE_UPLOAD')){
 				    			 var inst = $.jstree.reference(data.reference),
 									obj = inst.get_node(data.reference);
 								 var id = obj.id;
