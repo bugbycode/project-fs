@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +96,8 @@ public class ProjectMemoController {
 	
 	@RequestMapping(value = "/queryByProjectId",method = {RequestMethod.GET})
 	@ResponseBody
-	public List<ProjectMemo> queryByProjectId(int projectId){
+	public List<ProjectMemo> queryByProjectId(int projectId,HttpServletRequest request){
+		HttpSession session = request.getSession();
 		Employee user = (Employee)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		int empId = user.getId();
 		Employee emp = employeeService.queryById(empId);
@@ -115,6 +117,9 @@ public class ProjectMemoController {
 		}else {
 			newList = list;
 		}
+		
+		session.setAttribute("defaultProjectId", projectId);
+		
 		return newList;
 	}
 	
