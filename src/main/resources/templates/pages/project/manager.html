@@ -387,7 +387,7 @@
 					dataType:'json',
 					cache:false,
 					success:function(result){
-						console.log(JSON.stringify(result));
+						//console.log(JSON.stringify(result));
 						if(result){
 							$("#project-info-modal-dialog").modal("show");
 							$("#project-info-modal-dialog").find("input[id='fileName']").val(result.fileName);
@@ -814,7 +814,7 @@
 			    series: [
 			        {
 			            type:'pie',
-			            radius: ['34%', '35%'],
+			            radius: ['48%', '50%'],
 			            avoidLabelOverlap: false,
 			            hoverAnimation:false,
 			            animation: false,
@@ -866,17 +866,6 @@
                 }
                 
                 chartApp.option.series[0].data = [
-    				{
-                        value:100 - completePercent, 
-                        itemStyle:{
-                          color:'#ffffff'  
-                        },
-                        label:{
-                            normal:{
-                                show:false
-                            }
-                        }
-                    },
                     {
                         value:completePercent, 
                         name:msg,
@@ -890,6 +879,16 @@
                                 color:'#ffffff'
                             }
                             
+                        }
+                    },{
+                        value:100 - completePercent, 
+                        itemStyle:{
+                          color:'#ffffff'  
+                        },
+                        label:{
+                            normal:{
+                                show:false
+                            }
                         }
                     }
     			];
