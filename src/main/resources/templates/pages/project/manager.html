@@ -102,6 +102,9 @@
 							<h4 class="panel-title">文档信息</h4>
 						</div>
 						<div class="panel panel-body">
+							<!-- 
+							<input type="file" id="testFileObj" name="file">
+							<button id="testFle" onclick="testUpFile()">提交</button> -->
 							<div class="col-sm-12 table-responsive p-l-0 p-r-0">
 							<table style="table-layout:fixed;" id="data-table-default-file" class="table table-striped table-bordered dataTable no-footer dtr-inline table-hover">
 								<thead>
@@ -245,6 +248,10 @@
 	<form id="deletePmForm" th:action="@{/projectMemo/delete}" method="post">
 		<input type="hidden" name="id" value=""/>
 	</form>
+	
+	<div class="modal fade" id="process-modal-dialog">
+		<div id="processChart" style="margin-left: 30%;display:block;width:500px;height:500px;"></div>
+	</div>
 	<!-- ================== BEGIN BASE JS ================== -->
 	<script th:src="@{/assets/plugins/jquery-ui/jquery-ui.min.js}"></script>
 	<script th:src="@{/assets/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
@@ -266,7 +273,12 @@
 	<script th:src="@{/assets/plugins/bootstrap-sweetalert/sweetalert.min.js}"></script>
 	<!-- 模态框  END-->
 	
+	<!-- echarts -->
+	<script th:src="@{/javascript/echarts/dist/echarts.min.js}"></script>
+	<!-- echarts END -->
+	
 	<script type="text/javascript" th:inline="javascript">
+		var _csrf = [[${_csrf.token}]];
 		var authorities = [[${session.SPRING_SECURITY_CONTEXT.authentication.authorities}]];
 		var rootPath = [[@{/}]];
 		var idReg = /^[0-9]*$/;
@@ -604,10 +616,225 @@
 		});
 		
 		$(".addFileForm").click(function(){
-			$("#addFileForm").submit();
+			var check = $("#addFileForm").parsley().validate();
+			if(!check){
+				return false;
+			}
+			//$("#addFileForm").submit();
+			$("#project-file-up-modal-dialog").modal("hide");
+			/*var fileObj = $("#addFileForm").find("input[name='file']").get(0).files[0];
+			var projectId = $("#addFileForm").find("input[name='projectId']").val();
+			var description = $("#addFileForm").find("input[name='description']").text();*/
+			var upForm = new FormData($("#addFileForm").get(0));
+			/*if(upForm){
+				return false;
+			}*/
+			/*upForm.append('file', fileObj);
+			upForm.append('_csrf',_csrf);
+			upForm.append('projectId', projectId);
+			upForm.append('description', description);*/
+			// XMLHttpRequest 对象
+	        var xhr = new XMLHttpRequest();
+	        //true为异步处理
+	        xhr.open('post', $("#addFileForm").attr("action"), true);
+	        
+	        xhr.onloadstart = function() {
+	             console.log('开始上传')
+	             ot = new Date().getTime();   //设置上传开始时间
+	             oloaded = 0;//已上传的文件大小为0
+	     		 var option = chartApp.option;
+	             option.series[0].data = [];
+	             $("#process-modal-dialog").modal("show");
+	        };
+	        
+	        xhr.upload.addEventListener('progress', progressFunction, false);
+	        xhr.addEventListener("load", uploadComplete, false);
+	        xhr.addEventListener("error", uploadFailed, false);
+	        xhr.addEventListener("abort", uploadCanceled, false);
+	        xhr.send(upForm);
 		});
 		
 		showFileList(0);
+		
+		function showProcess(){
+			 var app = echarts.init(document.getElementById('processChart'));
+			 var option = {
+			    series: [
+			        {
+			            type:'pie',
+			            radius: ['34%', '35%'],
+			            avoidLabelOverlap: false,
+			            hoverAnimation:false,
+			            animation: false,
+			            labelLine: {
+			                normal: {
+			                    show: false
+			                }
+			            },
+			            data:[]
+			        }
+			    ]
+			};
+			app.setOption(option);
+			var result = {app:app,option:option};
+			return result;
+		}
+		
+		var oloaded = 0;
+		var ot = 0;
+		var chartApp = showProcess();
+		function progressFunction(evt){
+			if (evt.lengthComputable) {
+                var completePercent = Math.round(evt.loaded / evt.total * 100);
+                
+                var nt = new Date().getTime();     //获取当前时间
+                var pertime = (nt-ot)/1000;        //计算出上次调用该方法时到现在的时间差，单位为s
+                ot = new Date().getTime();          //重新赋值时间，用于下次计算
+                
+                var perload = evt.loaded - oloaded; //计算该分段上传的文件大小，单位b       
+                oloaded = evt.loaded;               //重新赋值已上传文件大小
+            
+                //上传速度计算
+                var speed = perload/pertime;//单位b/s
+                var bspeed = speed;
+                var units = 'b/s';//单位名称
+                if(speed/1024>1){
+                    speed = speed/1024;
+                    units = 'k/s';
+                }
+                if(speed/1024>1){
+                    speed = speed/1024;
+                    units = 'M/s';
+                }
+                speed = speed.toFixed(1);
+                
+                var msg = '上传进度：' + completePercent + '%\n\n传输速度：' + speed + units;
+                if(completePercent == 100){
+                	msg += '\n\n文件上传完成，正在计算文件MD5值';
+                }
+                
+                chartApp.option.series[0].data = [
+    				{
+                        value:100 - completePercent, 
+                        itemStyle:{
+                          color:'#ffffff'  
+                        },
+                        label:{
+                            normal:{
+                                show:false
+                            }
+                        }
+                    },
+                    {
+                        value:completePercent, 
+                        name:msg,
+                        itemStyle:{
+                          color:'#00FF00'  
+                        },
+                        label:{
+                            normal:{
+                                show:true,
+                                position:'center',
+                                color:'#ffffff'
+                            }
+                            
+                        }
+                    }
+    			];
+                chartApp.app.setOption(chartApp.option);
+                //console.log(completePercent + ' ' + speed + units);
+            }
+		}
+		
+		//上传成功后回调                                                                 
+        function uploadComplete(evt) {
+        	location.href= rootPath + "project/query";
+        };
+
+        //上传失败回调            
+        function uploadFailed(evt) {
+            //$("#process-modal-dialog").css('display',"none");
+            console.log('上传失败' + evt.target.responseText);
+            location.href= rootPath + "project/query";
+        }
+
+        //终止上传      
+        function cancelUpload() {
+            xhr.abort();
+        }
+        
+        //上传取消后回调             
+        function uploadCanceled(evt) {
+            console.log('上传取消,上传被用户取消或者浏览器断开连接:' + evt.target.responseText);
+        }
+		
+		function testUpFile(){
+			var fileObj = $("#testFileObj").get(0).files[0];
+			
+			var upForm = new FormData();
+			upForm.append('file', fileObj);
+			upForm.append('_csrf',_csrf);
+			// XMLHttpRequest 对象
+	        var xhr = new XMLHttpRequest();
+	        //true为异步处理
+	        xhr.open('post', rootPath + 'projectMemo/testUpFile', true);
+	        
+	        xhr.onloadstart = function() {
+	             console.log('开始上传')
+	             ot = new Date().getTime();   //设置上传开始时间
+	             oloaded = 0;//已上传的文件大小为0
+	     		 var option = chartApp.option;
+	             option.series[0].data = [];
+	             $("#process-modal-dialog").modal("show");
+	        };
+	        
+	        xhr.upload.addEventListener('progress', progressFunction, false);
+	        xhr.addEventListener("load", uploadComplete, false);
+	        xhr.addEventListener("error", uploadFailed, false);
+	        xhr.addEventListener("abort", uploadCanceled, false);
+	        xhr.send(upForm);
+			//$("#process-modal-dialog").modal("show");
+		}
+		
+		/*
+		var number = 0;
+		var number2 = 100;
+		var chartApp = showProcess();
+		var app = chartApp.app;
+		var option = chartApp.option;
+		var lin = setInterval(() => {
+			option.series[0].data = [
+				{
+                    value:--number2, 
+                    itemStyle:{
+                      color:'#ffffff'  
+                    },
+                    label:{
+                        normal:{
+                            show:false
+                        }
+                    }
+                },
+                {
+                    value:++number, 
+                    name:'上传进度：' + number + '%\n\n传输速度：' + '2MB/S',
+                    itemStyle:{
+                      color:'#00FF00'  
+                    },
+                    label:{
+                        normal:{
+                            show:true,
+                            position:'center',
+                            color:'#ffffff'
+                        }
+                        
+                    }
+                }
+			];
+			if(number2 >= 0){
+				app.setOption(option);
+			}
+		}, 1000);*/
 	</script>
 </body>
 </html>

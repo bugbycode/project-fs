@@ -43,7 +43,12 @@ public class ProjectMemoController {
 	
 	@Value("${spring.server.projectFilePath}")
 	private String basePath;
-
+	
+	@RequestMapping(value = "/testUpFile",method = {RequestMethod.POST})
+	public String testUpFile(MultipartFile file) {
+		return "redirect:/project/query";
+	}
+	
 	@RequestMapping(value = "/upFile",method = {RequestMethod.POST})
 	public String upFile(int projectId,String description,MultipartFile file) throws IOException {
 		if (file.isEmpty()) {
