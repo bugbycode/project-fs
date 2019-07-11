@@ -9,6 +9,8 @@ public interface ProjectMemoDao {
 
 	public List<ProjectMemo> query(Map<String,Object> params);
 	
+	public int count(Map<String,Object> params);
+	
 	public void update(Map<String,Object> params);
 	
 	public void insert(ProjectMemo pm);

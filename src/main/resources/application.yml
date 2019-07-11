@@ -15,7 +15,7 @@ spring:
     datasource:
       url: jdbc:mysql://localhost:3306/project_fs?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true
       username: root
-      password: 2wsx3edc
+      password: Cl0vdsec.mysql
       driverClassName: com.mysql.jdbc.Driver
     projectFilePath: /home/project/file
   thymeleaf:

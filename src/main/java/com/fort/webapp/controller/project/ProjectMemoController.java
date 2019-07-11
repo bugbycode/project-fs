@@ -31,6 +31,7 @@ import com.fort.module.project.ProjectMemo;
 import com.fort.service.employee.EmployeeService;
 import com.fort.service.project.ProjectMemoService;
 import com.util.MD5Util;
+import com.util.page.SearchResult;
 
 @Controller
 @RequestMapping("/projectMemo")
@@ -96,13 +97,29 @@ public class ProjectMemoController {
 	
 	@RequestMapping(value = "/queryByProjectId",method = {RequestMethod.GET})
 	@ResponseBody
-	public List<ProjectMemo> queryByProjectId(int projectId,HttpServletRequest request){
+	public SearchResult<ProjectMemo> queryByProjectId(
+		int projectId,
+		@RequestParam(name = "paramQuery",defaultValue="")
+		String paramQuery,
+		@RequestParam(name = "startIndex",defaultValue="0")
+		int offset,
+		@RequestParam(name = "pageSize",defaultValue="10")
+		int limit,HttpServletRequest request){
 		HttpSession session = request.getSession();
 		Employee user = (Employee)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		int empId = user.getId();
 		Employee emp = employeeService.queryById(empId);
 		String grant = emp.getProjectGrant();
-		Map<String, Object> params = new HashMap<String,Object>();
+		
+		session.setAttribute("defaultProjectId", projectId);
+		
+		if(user.getRole().getType() == 0) {
+			grant = "";
+		}
+		
+		return projectMemoService.search(projectId, grant, paramQuery, offset, limit);
+		
+		/*Map<String, Object> params = new HashMap<String,Object>();
 		params.put("projectId", projectId);
 		List<ProjectMemo> list = projectMemoService.query(params);
 		List<ProjectMemo> newList = new ArrayList<ProjectMemo>();
@@ -120,7 +137,7 @@ public class ProjectMemoController {
 		
 		session.setAttribute("defaultProjectId", projectId);
 		
-		return newList;
+		return newList;*/
 	}
 	
 	@RequestMapping(value = "/download",method = {RequestMethod.GET})

@@ -52,7 +52,7 @@
 				]]>
 			</if>
 		</where>
-		<if test="offset!=null and offset!=''">
+		<if test="limit!=null and limit!=''">
 			<![CDATA[
 				LIMIT #{offset},#{limit}
 			]]>

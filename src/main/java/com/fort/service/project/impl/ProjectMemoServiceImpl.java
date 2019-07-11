@@ -1,6 +1,7 @@
 package com.fort.service.project.impl;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,9 @@ import org.springframework.stereotype.Service;
 import com.fort.dao.project.ProjectMemoDao;
 import com.fort.module.project.ProjectMemo;
 import com.fort.service.project.ProjectMemoService;
+import com.util.StringUtil;
+import com.util.page.Page;
+import com.util.page.SearchResult;
 
 @Service("projectMemoService")
 public class ProjectMemoServiceImpl implements ProjectMemoService {
@@ -75,6 +79,37 @@ public class ProjectMemoServiceImpl implements ProjectMemoService {
 		Map<String, Object> params = new HashMap<String,Object>();
 		params.put("projectId", projectId);
 		return projectMemoDao.query(params);
+	}
+
+	@Override
+	public SearchResult<ProjectMemo> search(int projectId,String grant,String keyword,int offset,int limit) {
+		SearchResult<ProjectMemo> sr = new SearchResult<ProjectMemo>();
+		Map<String, Object> params = new HashMap<String,Object>();
+		params.put("projectId", projectId);
+		if(StringUtil.isNotEmpty(keyword)) {
+			params.put("keyword", keyword);
+		}
+		
+		if(StringUtil.isNotEmpty(grant)) {
+			String[] grantArr = {};
+			if(grant.indexOf(',') == -1) {
+				grantArr = new String[] {grant};
+			}else {
+				grantArr = grant.split(",");
+			}
+			params.put("grant", grantArr);
+		}
+		params.put("offset", offset);
+		params.put("limit", limit);
+		
+		Page page = new Page(limit, offset);
+		int totalCount = projectMemoDao.count(params);
+		if(totalCount > 0) {
+			page.setTotalCount(totalCount);
+			sr.setList(projectMemoDao.query(params));
+		}
+		sr.setPage(page);
+		return sr;
 	}
 
 }

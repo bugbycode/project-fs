@@ -37,4 +37,9 @@ public class ProjectMemoDaoImpl extends BaseDao implements ProjectMemoDao {
 		return getSqlSession().selectOne("pm.queryById", id);
 	}
 
+	@Override
+	public int count(Map<String, Object> params) {
+		return getSqlSession().selectOne("pm.count", params);
+	}
+
 }

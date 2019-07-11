@@ -42,6 +42,12 @@
 	<!-- ================== END BASE JS ================== -->
 	<!-- ================== END PAGE LEVEL JS ================== -->
 	<script type="text/javascript" th:src="@{/javascript/custom/bugbycode.js}"></script>
+	<style>
+		#page_table{
+			margin-top: 10px;
+			margin-right: 20px;
+		}
+   </style>
 </head>
 <body>
 	<!-- begin #page-loader -->
@@ -102,13 +108,14 @@
 							<h4 class="panel-title">文档信息</h4>
 						</div>
 						<div class="panel panel-body">
-							<form autocomplete="off">
+							<form id="documenForm" autocomplete="off">
+							<input type="hidden" id="docProjectId" value="">
 							<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
 								<div class="row">
 									<div class="col-sm-12 p-l-0 p-r-0">
 										<div class="dataTables_filter">
 											<label>
-												<i class="ion-ios-search fa-2x fa-fw pull-right m-r-0 text-black-lighter hand"></i>
+												<i onclick="query()" class="ion-ios-search fa-2x fa-fw pull-right m-r-0 text-black-lighter hand"></i>
 												<input type="text" name="paramQuery" value="" class="form-control input-sm pull-right width-250" placeholder="匹配文件名称、备注以及MD5值" aria-controls="data-table-default">
 											</label>
 										</div>
@@ -132,6 +139,11 @@
 												</tr>
 											</tbody>
 										</table>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-12 p-l-0 p-r-0">
+										<div class="memoPage"></div>
 									</div>
 								</div>
 							</div>
@@ -295,7 +307,7 @@
 		var authorities = [[${session.SPRING_SECURITY_CONTEXT.authentication.authorities}]];
 		var rootPath = [[@{/}]];
 		var idReg = /^[0-9]*$/;
-		console.log(JSON.stringify(authorities));
+		//console.log(JSON.stringify(authorities));
 		
 		function showMessage(message){
 			window.event.preventDefault();
@@ -389,13 +401,132 @@
 			}
 		}
 		
-		function showFileList(id){
+		//分页
+		function changeRecord(num){
+			$("#startIndex").val(num);
+			query();
+		}
+	    function gopage(lastnum){
+	    	var page = $("#page").val();
+	    	var num = parseInt(page * 10) - parseInt(10);
+	    	if (num > lastnum) {
+	    		num = lastnum;
+	 		}
+	    	if(num < 0){
+	    		num = 0;
+	    	}
+	    	$("#startIndex").val(num);
+	    	query();
+	    }
+	    function query(){
+	    	//$("#page").parents("form").submit();
+	    	showFileList($("#docProjectId").val(),$("input[name='paramQuery']").val(),$("#startIndex").val());
+	    }
+	    
+	    $("input[name='paramQuery']").keypress(function(event){
+			if(event.keyCode == 13){
+				query();
+			}
+		});
+		
+		function showFileList(id,keyword,startIndex){
 			$.ajax({
 		    	url:rootPath + 'projectMemo/queryByProjectId',
-		    	data:"projectId=" + id,
+		    	data:"projectId=" + id + "&paramQuery=" + keyword + "&startIndex=" + startIndex,
 		    	dataType:"json",
 		    	cache:false,
-		    	success:function(result){
+		    	success:function(data){
+		    		var result = data.list;
+		    		var page = data.page;
+		    		
+		    		var pageStr = "";
+		    		if(page){
+		    			pageStr += "<div class=\"row\"><div class=\"col-sm-5\">";
+		    			pageStr += "<div class=\"dataTables_info\" id=\"data-table-default_info\" role=\"status\" aria-live=\"polite\">";
+		    			pageStr += "<span>共计 " + page.totalCount + " 条记录，" + "当前第 " + page.currentPage + "/" + page.pageCount + " 页</span>";
+		    			pageStr += "</div></div>";
+		    			
+		    			pageStr += "<div class=\"col-sm-7\"><ul class=\"pagination\">";
+		    			
+		    			if(page.startIndex == 0){
+		    				pageStr += "<li class=\"page-item disabled\">";
+		    				pageStr += "	<a href=\"javascript:;\" class=\"page-link\">";
+		    				pageStr += "		<i class=\"fas fa-angle-double-left\"></i>";
+		    				pageStr += "	</a>";
+		    				pageStr += "</li>";
+		    			}
+		    			if(page.startIndex > 0){
+		    				pageStr += "<li class=\"page-item\">";
+		    				pageStr += "	<a href=\"javascript:;\" onclick=\"changeRecord(\'0\')\" class=\"page-link\">";
+		    				pageStr += "		<i class=\"fas fa-angle-double-left\"></i>";
+		    				pageStr += "	</a>";
+		    				pageStr += "</li>";
+		    			}
+		    			
+		    			if(page.startIndex == 0){
+		    				pageStr += "<li class=\"page-item disabled\">";
+		    				pageStr += "	<a href=\"javascript:;\" class=\"page-link\">";
+		    				pageStr += "		<i class=\"fas fa-angle-left\"></i>";
+		    				pageStr += "	</a>";
+		    				pageStr += "</li>";
+		    			}
+		    			
+		    			if(page.startIndex > 0){
+		    				pageStr += "<li class=\"page-item\">";
+		    				pageStr += "	<a href=\"javascript:;\" onclick=\"changeRecord(\'" + page.previousIndex + "\')\" class=\"page-link\">";
+		    				pageStr += "		<i class=\"fas fa-angle-left\"></i>";
+		    				pageStr += "	</a>";
+		    				pageStr += "</li>";
+		    			}
+		    			
+		    			if(page.nextIndex == page.startIndex){
+		    				pageStr += "<li class=\"page-item disabled\">";
+		    				pageStr += "	<a href=\"javascript:;\" class=\"page-link\">";
+		    				pageStr += "		<i class=\"fas fa-angle-right\"></i>";
+		    				pageStr += "	</a>";
+		    				pageStr += "</li>";
+		    			}
+		    			if(page.nextIndex != page.startIndex){
+		    				pageStr += "<li class=\"page-item\">";
+		    				pageStr += "	<a href=\"javascript:;\" onclick=\"changeRecord(\'" + page.nextIndex + "\')\" class=\"page-link\">";
+		    				pageStr += "		<i class=\"fas fa-angle-right\"></i>";
+		    				pageStr += "	</a>";
+		    				pageStr += "</li>";
+		    			}
+		    			
+		    			if(page.lastIndex == page.startIndex){
+		    				pageStr += "<li class=\"page-item disabled\">";
+		    				pageStr += "	<a href=\"javascript:;\" class=\"page-link\">";
+		    				pageStr += "		<i class=\"fas fa-angle-double-right\"></i>";
+		    				pageStr += "	</a>";
+		    				pageStr += "</li>";
+		    			}
+		    			
+		    			if(page.lastIndex != page.startIndex || page.lastIndex > page.startIndex){
+		    				pageStr += "<li class=\"page-item\">";
+		    				pageStr += "	<a href=\"javascript:;\" onclick=\"changeRecord(\'" + page.lastIndex + "\')\" class=\"page-link\">";
+		    				pageStr += "		<i class=\"fas fa-angle-double-right\"></i>";
+		    				pageStr += "	</a>";
+		    				pageStr += "</li>";
+		    			}
+		    			
+		    			pageStr += "<li class=\"page-item\">";
+		    			pageStr += "	<input id=\"page\" class=\"form-control pageText\" style=\"height: 30px;margin: 1px 0px 0px 4px;width: 60px;\" th:value=\"" + page.currentPage + "\" />";
+		    			pageStr += "</li>";
+		    			pageStr += "<li class=\"page-item\">";
+		    			pageStr += "	<input type=\"hidden\" name=\"startIndex\" id=\"startIndex\" value=\"0\">";
+		    			pageStr += "	<input type=\"hidden\" name=\"lastIndex\" id=\"lastIndex\" value=\"" + page.lastIndex + "\">";
+		    			pageStr += "	<a href=\"javascript:;\" onclick=\"gopage(\'" + page.lastIndex + "\')\" class=\"page-link\">";
+		    			pageStr += "		<i class=\"fas fa-search\"></i>";
+		    			pageStr += "	</a>";
+		    			pageStr += "</li>";
+		    			
+		    			pageStr += "</ul></div>";
+		    			pageStr += "</div>";
+		    		}
+		    		
+		    		$(".memoPage").html(pageStr);
+		    		
 		    		if(result.length > 0){
 		    			$("#data-table-default-file").find("tbody").find("tr").eq(0).hide();
 		    		}else{
@@ -615,7 +746,8 @@
 		    if(!idReg.test(id)){
 	   	    	id = 0;
 	   	    }
-		    showFileList(id);
+		    $("#docProjectId").val(id);
+		    showFileList(id,'',0);
 		});;
 		
 		$(".addForm").click(function(e){
@@ -672,7 +804,8 @@
 			if(projectId == null || projectId == 'null'){
 				projectId = 0;
 			}
-			showFileList(projectId);
+			$("#docProjectId").val(projectId);
+			showFileList(projectId,'',0);
 		});
 		
 		function showProcess(){

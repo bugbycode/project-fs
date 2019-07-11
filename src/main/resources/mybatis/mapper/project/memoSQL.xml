@@ -44,20 +44,74 @@
 			FROM `project_memo` pm LEFT JOIN project p ON pm.`project_id` = p.`id`
 		]]>
 		<where>
+			<if test="keyword!=null and keyword!=''">
+				<![CDATA[
+					AND (pm.`file_name` LIKE CONCAT('%',#{keyword},'%')
+						OR pm.`md5_sign` LIKE CONCAT('%',#{keyword},'%')
+						OR pm.`description` LIKE CONCAT('%',#{keyword},'%')
+					)
+				]]>
+			</if>
+			<if test="grant!=null and grant!=''">
+				<![CDATA[
+					AND pm.`project_id` IN 
+				]]>
+				<foreach collection="grant" item="item" separator="," open="(" close=")">
+					<![CDATA[
+						#{item}
+					]]>
+				</foreach>
+			</if>
 			<if test="projectId!=null and projectId!=''">
 				<![CDATA[
-					pm.`project_id` = #{projectId}
+					AND pm.`project_id` = #{projectId}
 				]]>
 			</if>
 			<if test="md5Sign!=null and md5Sign!=''">
 				<![CDATA[
-					pm.md5_sign = #{md5Sign}
+					AND pm.md5_sign = #{md5Sign}
 				]]>
 			</if>
 		</where>
 		<![CDATA[
 			ORDER BY pm.`create_time` DESC
 		]]>
+		<if test="limit!=null and limit!=''">
+			<![CDATA[
+				LIMIT #{offset},#{limit}
+			]]>
+		</if>
+	</select>
+	
+	<select id="count" parameterType="java.util.HashMap" resultType="int">
+		<![CDATA[
+			SELECT COUNT(pm.id) FROM `project_memo` pm
+		]]>
+		<where>
+			<if test="keyword!=null and keyword!=''">
+				<![CDATA[
+					AND (pm.`file_name` LIKE CONCAT('%',#{keyword},'%')
+						OR pm.`md5_sign` LIKE CONCAT('%',#{keyword},'%')
+						OR pm.`description` LIKE CONCAT('%',#{keyword},'%')
+					)
+				]]>
+			</if>
+			<if test="grant!=null and grant!=''">
+				<![CDATA[
+					AND pm.`project_id` IN 
+				]]>
+				<foreach collection="grant" item="item" separator="," open="(" close=")">
+					<![CDATA[
+						#{item}
+					]]>
+				</foreach>
+			</if>
+			<if test="projectId!=null and projectId!=''">
+				<![CDATA[
+					AND pm.`project_id` = #{projectId}
+				]]>
+			</if>
+		</where>
 	</select>
 	
 	<update id="update" parameterType="java.util.HashMap">
