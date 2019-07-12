@@ -1,7 +1,12 @@
 package com.fort.webapp.controller.project;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
@@ -18,6 +24,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +38,7 @@ import com.fort.module.project.ProjectMemo;
 import com.fort.service.employee.EmployeeService;
 import com.fort.service.project.ProjectMemoService;
 import com.util.MD5Util;
+import com.util.StringUtil;
 import com.util.page.SearchResult;
 
 @Controller
@@ -53,6 +61,21 @@ public class ProjectMemoController {
 	
 	@RequestMapping(value = "/upFile",method = {RequestMethod.POST})
 	public String upFile(int projectId,String description,MultipartFile file) throws IOException {
+		Employee user = (Employee)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int empId = user.getId();
+		Employee emp = employeeService.queryById(empId);
+		String grant = emp.getProjectGrant();
+		
+		if(!"系统管理员".equals(user.getRole().getName())) {
+			if(StringUtil.isEmpty(grant)) {
+				throw new AccessDeniedException("您无权访问该信息");
+			}
+			if(!(grant.startsWith(projectId + ",") || grant.contains("," + projectId + ",")
+					|| grant.endsWith("," + projectId) || grant.equals(String.valueOf(projectId)))) {
+				throw new AccessDeniedException("您无权访问该信息");
+			}
+		}
+		
 		if (file.isEmpty()) {
 			return "redirect:/project/query";
         }
@@ -113,8 +136,10 @@ public class ProjectMemoController {
 		
 		session.setAttribute("defaultProjectId", projectId);
 		
-		if(user.getRole().getType() == 0) {
+		if("系统管理员".equals(user.getRole().getName())) {
 			grant = "";
+		}else if(StringUtil.isEmpty(grant)) {
+			return new SearchResult<ProjectMemo>();
 		}
 		
 		return projectMemoService.search(projectId, grant, paramQuery, offset, limit);
@@ -141,11 +166,30 @@ public class ProjectMemoController {
 	}
 	
 	@RequestMapping(value = "/download",method = {RequestMethod.GET})
-	public ResponseEntity<byte[]> download(HttpServletRequest request, 
-			@RequestParam("id") int id) throws Exception{
+	public void download(HttpServletRequest request, 
+			HttpServletResponse response,
+			@RequestParam("id") int id){
+		
+		Employee user = (Employee)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int empId = user.getId();
+		Employee emp = employeeService.queryById(empId);
+		String grant = emp.getProjectGrant();
+		
 		ProjectMemo pm = projectMemoService.queryById(id);
 		if(pm == null) {
-			throw new RuntimeException("该记录已不存在");
+			throw new AccessDeniedException("该记录已不存在");
+		}
+		
+		int projectId = pm.getProjectId();
+		
+		if(!"系统管理员".equals(user.getRole().getName())) {
+			if(StringUtil.isEmpty(grant)) {
+				throw new AccessDeniedException("您无权访问该信息");
+			}
+			if(!(grant.startsWith(projectId + ",") || grant.contains("," + projectId + ",")
+					|| grant.endsWith("," + projectId) || grant.equals(String.valueOf(projectId)))) {
+				throw new AccessDeniedException("您无权访问该信息");
+			}
 		}
 		
 		if(!basePath.endsWith("/")) {
@@ -153,6 +197,45 @@ public class ProjectMemoController {
 		}
 		
 		File file = new File(basePath + pm.getMd5Sign());
+		
+		InputStream in = null;
+		OutputStream out = null;
+		byte[] buff = new byte[4096];
+		int len = -1;
+		try {
+			//下载的文件携带这个名称
+		    response.setHeader("Content-Disposition", "attachment;filename=" + new String(pm.getFileName().getBytes("UTF-8"),"iso-8859-1"));
+		    //文件下载类型--二进制文件
+		    response.setContentType("application/octet-stream");
+			
+		    out = response.getOutputStream();
+		    
+		    in = new FileInputStream(file);
+		    while((len = in.read(buff)) != -1) {
+		    	out.write(buff, 0, len);
+		    	out.flush();
+		    }
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(out != null) {
+					out.close();
+				}
+				if(in != null) {
+					in.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	    
+		/*
 		HttpHeaders headers = new HttpHeaders();
         // 解决中文乱码
         String downloadfile =  new String(pm.getFileName().getBytes("UTF-8"),"iso-8859-1");
@@ -160,18 +243,61 @@ public class ProjectMemoController {
         headers.setContentDispositionFormData("attachment", downloadfile);
         // 二进制流
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-
-        return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file),headers,HttpStatus.CREATED);
+        return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file),headers,HttpStatus.CREATED);*/
 	}
 	
 	@RequestMapping(value = "/queryById",method = {RequestMethod.GET})
 	@ResponseBody
 	public ProjectMemo queryById(int id) {
+		Employee user = (Employee)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int empId = user.getId();
+		Employee emp = employeeService.queryById(empId);
+		String grant = emp.getProjectGrant();
+		
+		ProjectMemo pm = projectMemoService.queryById(id);
+		if(pm == null) {
+			throw new AccessDeniedException("该记录已不存在");
+		}
+		
+		int projectId = pm.getProjectId();
+		
+		if(!"系统管理员".equals(user.getRole().getName())) {
+			if(StringUtil.isEmpty(grant)) {
+				throw new AccessDeniedException("您无权访问该信息");
+			}
+			if(!(grant.startsWith(projectId + ",") || grant.contains("," + projectId + ",")
+					|| grant.endsWith("," + projectId) || grant.equals(String.valueOf(projectId)))) {
+				throw new AccessDeniedException("您无权访问该信息");
+			}
+		}
 		return projectMemoService.queryById(id);
 	}
 	
 	@RequestMapping(value = "/delete",method = {RequestMethod.POST})
 	public String delete(int id) {
+		
+		Employee user = (Employee)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int empId = user.getId();
+		Employee emp = employeeService.queryById(empId);
+		String grant = emp.getProjectGrant();
+		
+		ProjectMemo pm = projectMemoService.queryById(id);
+		if(pm == null) {
+			throw new AccessDeniedException("该记录已不存在");
+		}
+		
+		int projectId = pm.getProjectId();
+		
+		if(!"系统管理员".equals(user.getRole().getName())) {
+			if(StringUtil.isEmpty(grant)) {
+				throw new AccessDeniedException("您无权访问该信息");
+			}
+			if(!(grant.startsWith(projectId + ",") || grant.contains("," + projectId + ",")
+					|| grant.endsWith("," + projectId) || grant.equals(String.valueOf(projectId)))) {
+				throw new AccessDeniedException("您无权访问该信息");
+			}
+		}
+		
 		projectMemoService.delete(id);
 		return "redirect:/project/query";
 	}
