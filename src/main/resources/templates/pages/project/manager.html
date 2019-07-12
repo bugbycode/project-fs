@@ -747,6 +747,7 @@
 	   	    	id = 0;
 	   	    }
 		    $("#docProjectId").val(id);
+		    $("input[name='paramQuery']").val('');
 		    showFileList(id,'',0);
 		});;
 		
@@ -805,6 +806,7 @@
 				projectId = 0;
 			}
 			$("#docProjectId").val(projectId);
+		    $("input[name='paramQuery']").val('');
 			showFileList(projectId,'',0);
 		});
 		
